@@ -1,0 +1,8 @@
+#include "systick.h"
+
+void SYSTICK_Init()
+{
+    SYSTICK->LOAD = (200000000 / 1000) - 1;
+    SYSTICK->CTRL = SYSTICK_CTRL_TICKINT | SYSTICK_CTRL_EN | SYSTICK_CTRL_CLKSRC_AHB;
+    SYSTICK->VAL = 0;
+}

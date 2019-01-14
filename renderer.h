@@ -1,0 +1,60 @@
+#ifndef RENDERER_H_
+#define RENDERER_H_
+
+#include "stm32f7.h"
+#include "ltdc.h"
+
+#ifndef RENDER_MODE
+#define RENDER_MODE 0
+#endif
+
+#if RENDER_MODE == 0
+#define TRUE_COLOR
+#include "colors32.h"
+#elif RENDER_MODE == 1
+#define HIGH_COLOR
+#include "colors16.h"
+#elif RENDER_MODE == 2
+#define PALETTE_COLOR
+#include "colors8.h"
+#else
+#define GRAYSCALE_COLOR
+#endif
+
+#if defined TRUE_COLOR
+typedef uint32_t color_t;
+#elif defined HIGH_COLOR
+typedef uint16_t color_t;
+#else 
+typedef uint8_t color_t;
+#endif
+
+typedef struct 
+{
+    uint16_t x;
+    uint16_t y;
+    uint16_t width;
+    uint16_t height;
+} viewport_t;
+
+void REN_Init(viewport_t viewport);
+void REN_Clear(color_t color);
+
+void REN_PutPixel(int x, int y, color_t color);
+void REN_VerticalLine(int x, int y, int length, color_t color);
+void REN_HorizontalLine(int x, int y, int length, color_t color);
+
+void REN_DrawLine(int x0, int y0, int x1, int y1, color_t color);
+
+void REN_DrawRect(int x, int y, int width, int height, color_t color);
+void REN_FillRect(int x, int y, int width, int height, color_t color);
+
+void REN_DrawCircle(int x, int y, int radius, color_t color);
+void REN_FillCircle(int x, int y, int radius, color_t color);
+
+void REN_DrawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color);
+void REN_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color);
+
+void REN_Flip();
+
+#endif
