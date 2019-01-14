@@ -5,6 +5,8 @@
 
 #include "tft.h"
 
+#include <string.h>
+
 extern unsigned long _sframebuf;
 
 static color_t *frontBuffer;
@@ -83,6 +85,13 @@ void REN_Clear(color_t color)
    {
         currentBuffer[i] = color;
    }
+}
+
+void REN_Clear2(color_t color)
+{
+    uint32_t width = currentViewport.width;
+    uint32_t height = currentViewport.height;
+    memset(currentBuffer, color, width * height * sizeof *currentBuffer);
 }
 
 void REN_PutPixel(int x, int y, color_t color)

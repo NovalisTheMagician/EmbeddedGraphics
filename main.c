@@ -8,10 +8,6 @@
 #define RENDER_MODE 0
 #include "renderer.h"
 
-#include <malloc.h>
-
-//test
-
 #define LED1 1
 
 #define WIDTH 480
@@ -23,13 +19,11 @@ void led_off(uint32_t led);
 void blink(int amount, uint32_t led);
 void blink_fast(int amount, uint32_t led);
 
+int lerp(int a, int b, float f);
+
 int main()
 {
     GPIO_Conf(GPIOI, LED1, GPIO_MODE_OUT, GPIO_OTYPE_PUSHPULL, GPIO_OSPEED_VERYHIGHSPEED, GPIO_PUD_NONE);
-
-    char* space = malloc(5000000 * sizeof *space);
-    if(space != NULL)
-        led_on(LED1);
 
     viewport_t viewport = {
         0, 0, WIDTH, HEIGHT
@@ -82,9 +76,27 @@ int main()
             REN_FillRect(i * WIDTH / 256, 0, WIDTH / 256, HEIGHT, i);
         }
         */
+        
+        
+        for(int ny = 0; ny < HEIGHT; ++ny)
+        {
+            for(int nx = 0; nx < WIDTH; ++nx)
+            {
+                int r = 255 * nx / WIDTH;
+                int g = 255 * ny / HEIGHT;
+
+                REN_PutPixel(nx, ny, (255 << 24) | (r << 16) | (g << 8));
+            }
+        }
+        
 
         REN_Flip();
     }
+}
+
+int lerp(int a, int b, float f)
+{
+    return (int)((a * (1.0f - f)) + (b * f));
 }
 
 int n = 1000;

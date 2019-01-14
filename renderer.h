@@ -39,6 +39,7 @@ typedef struct
 
 void REN_Init(viewport_t viewport);
 void REN_Clear(color_t color);
+void REN_Clear2(color_t color);
 
 void REN_PutPixel(int x, int y, color_t color);
 void REN_VerticalLine(int x, int y, int length, color_t color);
