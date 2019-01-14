@@ -33,10 +33,12 @@ SECTIONS
     .bss :
     {
         _sbss = .;
+        __bss_start__ = .;
         *(.bss .bss.*)
         *(COMMON)
         . = ALIGN(4);
         _ebss = .;
+        __bss_end__ = .;
     } >RAM
 
     .framebuf :

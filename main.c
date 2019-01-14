@@ -8,6 +8,8 @@
 #define RENDER_MODE 0
 #include "renderer.h"
 
+#include <malloc.h>
+
 #define LED1 1
 
 #define WIDTH 480
@@ -22,6 +24,21 @@ void blink_fast(int amount, uint32_t led);
 int main()
 {
     GPIO_Conf(GPIOI, LED1, GPIO_MODE_OUT, GPIO_OTYPE_PUSHPULL, GPIO_OSPEED_VERYHIGHSPEED, GPIO_PUD_NONE);
+
+    int *arr = malloc(5 * sizeof *arr);
+    for(int i = 0; i < 5; ++i)
+    {
+        arr[i] = i + 1;
+    }
+
+    int sum = 0;
+    for(int i = 0; i < 5; ++i)
+    {
+        sum += arr[i];
+    }
+
+    if(sum == 15)
+        led_on(LED1);
 
     viewport_t viewport = {
         0, 0, WIDTH, HEIGHT

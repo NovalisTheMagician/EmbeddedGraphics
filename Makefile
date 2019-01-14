@@ -1,8 +1,8 @@
 CC = arm-none-eabi-gcc
-CFLAGS = -mcpu=cortex-m7 -mthumb -nostdlib -c -Wall -mfpu=fpv5-d16 -mfloat-abi=hard
+CFLAGS = -mcpu=cortex-m7 -mthumb -c -Wall -mfpu=fpv5-d16 -mfloat-abi=hard -MMD -I.
 
 LD = arm-none-eabi-ld
-LDFLAGS = -T layout.ld
+LDFLAGS = --specs=nano.specs -mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard -T layout.ld
 
 OC = arm-none-eabi-objcopy
 OCFLAGS = -O ihex
@@ -14,7 +14,7 @@ EXECUTABLE = graphics
 all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(LD) $(LDFLAGS) -o $@.elf $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $@.elf $(OBJECTS)
 	$(OC) $(OCFLAGS) $@.elf $@.hex
 
 .c.o: 

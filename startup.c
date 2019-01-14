@@ -8,12 +8,16 @@
 
 #include "interrupts.h"
 
+#include <errno.h>
+
 extern unsigned long _sflashdata;
 extern unsigned long _sdata;
 extern unsigned long _edata;
 extern unsigned long _sbss;
 extern unsigned long _ebss;
 extern unsigned long _estack;
+extern unsigned long _ssdram;
+extern unsigned long _esdram;
 
 extern int main();
 
@@ -178,3 +182,37 @@ void Startup()
     
     main();
 }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+char *__brkval = (char*)(&_ssdram);
+
+void* _sbrk(int incr)
+{
+    char *prev = __brkval;
+    if(incr != 0)
+    {
+        if(prev + incr >= (char*)&_esdram)
+        {
+            errno = ENOMEM;
+            return (void*)-1;
+        }
+        __brkval = prev + incr;
+    }
+    return prev;
+}
+
+__attribute__((weak))
+void _exit(int status)
+{
+    while(1);
+}
+
+__attribute__((weak))
+void abort()
+{
+    while(1);
+}
+
+#pragma GCC diagnostic pop
