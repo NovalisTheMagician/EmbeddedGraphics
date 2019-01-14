@@ -183,9 +183,6 @@ void Startup()
     main();
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
 char *__brkval = (char*)(&_ssdram);
 
 void* _sbrk(int incr)
@@ -208,11 +205,3 @@ void _exit(int status)
 {
     while(1);
 }
-
-__attribute__((weak))
-void abort()
-{
-    while(1);
-}
-
-#pragma GCC diagnostic pop

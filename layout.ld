@@ -52,8 +52,8 @@ SECTIONS
     {
         _ssdram = .;
         *(.sdram .sdram.*)
-        _esdram = .;
     } >SDRAM
+    _esdram = ORIGIN(SDRAM) + LENGTH(SDRAM);
 
     _estack = ORIGIN(RAM) + LENGTH(RAM);
 }
