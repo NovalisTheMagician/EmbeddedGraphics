@@ -1,28 +1,31 @@
+LD_FILE = layout.ld
+
 CC = arm-none-eabi-gcc
 CFLAGS = -mcpu=cortex-m7 -mthumb -c -Wall -mfpu=fpv5-d16 -mfloat-abi=hard -MMD -I.
 
-LD = arm-none-eabi-ld
-LDFLAGS = --specs=nano.specs -mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard -T layout.ld
+LDFLAGS = --specs=nano.specs -mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard -T $(LD_FILE)
+
+LIBS = -lm
 
 OC = arm-none-eabi-objcopy
 OCFLAGS = -O ihex
 
-SOURCES = startup.c gpio.c sdram.c rcc.c tft.c spi.c renderer.c delay.c main.c systick.c
+SOURCES := $(wildcard *.c)
 OBJECTS = $(SOURCES:.c=.o)
+
 EXECUTABLE = graphics
 
-all: $(SOURCES) $(EXECUTABLE)
+all: $(EXECUTABLE).hex
 
-$(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@.elf $(OBJECTS)
-	$(OC) $(OCFLAGS) $@.elf $@.hex
+$(EXECUTABLE).elf: $(OBJECTS) $(LD_FILE)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
-.c.o: 
-	$(CC) $(CFLAGS) $< -o $@
+%.hex: %.elf
+	$(OC) $(OCFLAGS) $< $@
+
+-include $(OBJECTS:.o=.d)
 
 .PHONY: clean
 
 clean:
-	rm *.o
-	rm *.hex
-	rm *.elf
+	rm -f *.o *.d $(EXECUTABLE).elf $(EXECUTABLE).hex
