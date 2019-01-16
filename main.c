@@ -5,6 +5,8 @@
 #include "systick.h"
 #include "delay.h"
 
+#include <math.h>
+
 #define RENDER_MODE 0
 #include "renderer.h"
 
@@ -49,8 +51,9 @@ int main()
 
         //draw state
         REN_Clear(clearColor);
-        REN_DrawRect(0, 0, WIDTH, HEIGHT, 255);
+        //REN_DrawRect(0, 0, WIDTH, HEIGHT, 255);
 
+        /*
         REN_FillRect(x, y, 16, 16, COL_WHITE);
 
         //REN_FillRect(100, 100, 32, 32, COL_GREEN);
@@ -72,13 +75,18 @@ int main()
 
         REN_FillCircle(WIDTH / 2, HEIGHT / 2, 200, COL_BLUE);
         REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 200, COL_CYAN);
+        */
         
-        /*
+        float a = 5.0f;
+        float b = 6.0f;
+        float c = a + b;
+
+        int sliver = (int)roundf(WIDTH / 255.0f);
+
         for(int i = 0; i < 256; ++i)
         {
-            REN_FillRect(i * WIDTH / 256, 0, WIDTH / 256, HEIGHT, i);
+            REN_FillRect(i * sliver, 0, sliver, HEIGHT, (255 << 24) | (i));
         }
-        */
         
         /*
         for(int ny = 0; ny < HEIGHT; ++ny)

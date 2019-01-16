@@ -1,9 +1,9 @@
 LD_FILE = layout.ld
 
 CC = arm-none-eabi-gcc
-CFLAGS = -mcpu=cortex-m7 -mthumb -c -Wall -mfpu=fpv5-d16 -mfloat-abi=hard -MMD -I.
+CFLAGS = -mcpu=cortex-m7 -mthumb -c -Wall -mfpu=fpv5-sp-d16 -mfloat-abi=hard -MMD -I.
 
-LDFLAGS = --specs=nano.specs -mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard -T $(LD_FILE)
+LDFLAGS = --specs=nano.specs -mcpu=cortex-m7 -mthumb -mfpu=fpv5-sp-d16 -mfloat-abi=hard -T $(LD_FILE)
 
 LIBS = -lm
 

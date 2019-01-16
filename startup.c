@@ -156,6 +156,12 @@ void (* const _vectors[113])(void) =
     SPDIFRXHandler
 };
 
+void EnableFPU()
+{
+    volatile uint32_t *CPACR = (uint32_t*)(0xE000ED88);
+    *CPACR = (3 << 22) | (3 << 20);
+}
+
 void Startup()
 {
     uint32_t *src = &_sflashdata;
@@ -179,6 +185,8 @@ void Startup()
     SDRAM_Init();
 
     TFT_Init();
+
+    EnableFPU();
     
     main();
 }
