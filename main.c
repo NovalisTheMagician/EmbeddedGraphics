@@ -69,6 +69,9 @@ int main()
         REN_DrawLine(100, 100, 150, 200, COL_BLUE);
 
         REN_DrawTriangle(200, 200, 300, 270, 250, 250, COL_CYAN);
+
+        REN_FillCircle(WIDTH / 2, HEIGHT / 2, 200, COL_BLUE);
+        REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 200, COL_CYAN);
         
         /*
         for(int i = 0; i < 256; ++i)
@@ -77,7 +80,7 @@ int main()
         }
         */
         
-        
+        /*
         for(int ny = 0; ny < HEIGHT; ++ny)
         {
             for(int nx = 0; nx < WIDTH; ++nx)
@@ -88,7 +91,7 @@ int main()
                 REN_PutPixel(nx, ny, (255 << 24) | (r << 16) | (g << 8));
             }
         }
-        
+        */
 
         REN_Flip();
     }

@@ -5,8 +5,6 @@
 
 #include "tft.h"
 
-#include <string.h>
-
 extern unsigned long _sframebuf;
 
 static color_t *frontBuffer;
@@ -85,13 +83,6 @@ void REN_Clear(color_t color)
    {
         currentBuffer[i] = color;
    }
-}
-
-void REN_Clear2(color_t color)
-{
-    uint32_t width = currentViewport.width;
-    uint32_t height = currentViewport.height;
-    memset(currentBuffer, color, width * height * sizeof *currentBuffer);
 }
 
 void REN_PutPixel(int x, int y, color_t color)
@@ -188,12 +179,49 @@ void REN_FillRect(int x, int y, int width, int height, color_t color)
 
 void REN_DrawCircle(int x, int y, int radius, color_t color)
 {
+    int _x = radius - 1;
+    int _y = 0;
+    int dx = 1;
+    int dy = 1;
+    int err = dx - (radius << 1);
 
+    while(_x >= _y)
+    {
+        REN_PutPixel(x + _x, y + _y, color);
+        REN_PutPixel(x + _y, y + _x, color);
+        REN_PutPixel(x - _y, y + _x, color);
+        REN_PutPixel(x - _x, y + _y, color);
+        REN_PutPixel(x - _x, y - _y, color);
+        REN_PutPixel(x - _y, y - _x, color);
+        REN_PutPixel(x + _y, y - _x, color);
+        REN_PutPixel(x + _x, y - _y, color);
+
+        if(err <= 0)
+        {
+            _y++;
+            err += dy;
+            dy += 2;
+        }
+
+        if(err > 0)
+        {
+            _x--;
+            dx += 2;
+            err += dx - (radius << 1);
+        }
+    }
 }
 
 void REN_FillCircle(int x, int y, int radius, color_t color)
 {
-
+    for(int _y = -radius; _y <= radius; ++_y)
+    {
+        for(int _x = -radius; _x <= radius; ++_x)
+        {
+            if((_x * _x) + (_y * _y) <= (radius * radius))
+                REN_PutPixel(x + _x, y + _y, color);
+        }
+    }
 }
 
 void REN_DrawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color)
