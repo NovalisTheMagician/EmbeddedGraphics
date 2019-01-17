@@ -4,30 +4,7 @@
 #include "stm32f7.h"
 #include "ltdc.h"
 
-#ifndef RENDER_MODE
-#define RENDER_MODE 0
-#endif
-
-#if RENDER_MODE == 0
-#define TRUE_COLOR
-#include "colors32.h"
-#elif RENDER_MODE == 1
-#define HIGH_COLOR
-#include "colors16.h"
-#elif RENDER_MODE == 2
-#define PALETTE_COLOR
-#include "colors8.h"
-#else
-#define GRAYSCALE_COLOR
-#endif
-
-#if defined TRUE_COLOR
 typedef uint32_t color_t;
-#elif defined HIGH_COLOR
-typedef uint16_t color_t;
-#else 
-typedef uint8_t color_t;
-#endif
 
 typedef struct 
 {
@@ -55,6 +32,8 @@ void REN_FillCircle(int x, int y, int radius, color_t color);
 
 void REN_DrawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color);
 void REN_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color);
+
+void REN_DrawString(const char *string, int x, int y, color_t color);
 
 void REN_Flip();
 

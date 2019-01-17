@@ -5,9 +5,10 @@
 #include "systick.h"
 #include "delay.h"
 
+#include "colors32.h"
+
 #include <math.h>
 
-#define RENDER_MODE 0
 #include "renderer.h"
 
 #define LED1 1
@@ -53,7 +54,6 @@ int main()
         REN_Clear(clearColor);
         //REN_DrawRect(0, 0, WIDTH, HEIGHT, 255);
 
-        /*
         REN_FillRect(x, y, 16, 16, COL_WHITE);
 
         //REN_FillRect(100, 100, 32, 32, COL_GREEN);
@@ -73,21 +73,9 @@ int main()
 
         REN_DrawTriangle(200, 200, 300, 270, 250, 250, COL_CYAN);
 
-        REN_FillCircle(WIDTH / 2, HEIGHT / 2, 200, COL_BLUE);
-        REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 200, COL_CYAN);
-        */
-        
-        float a = 5.0f;
-        float b = 6.0f;
-        float c = a + b;
+        REN_FillCircle(WIDTH / 2, HEIGHT / 2, 30, COL_BLUE);
+        REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 30, COL_CYAN);
 
-        int sliver = (int)roundf(WIDTH / 255.0f);
-
-        for(int i = 0; i < 256; ++i)
-        {
-            REN_FillRect(i * sliver, 0, sliver, HEIGHT, (255 << 24) | (i));
-        }
-        
         /*
         for(int ny = 0; ny < HEIGHT; ++ny)
         {

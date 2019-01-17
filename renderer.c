@@ -7,6 +7,16 @@
 
 extern unsigned long _sframebuf;
 
+static const int FONT_WIDTH = 10;
+static const int FONT_HEIGHT = 16;
+static const int NUM_CHARS = 32;
+/*
+static const uint8_t FONT[NUM_CHARS][FONT_SIZE * FONT_SIZE] = {
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {1}
+};
+*/
+
 static color_t *frontBuffer;
 static color_t *backBuffer;
 static color_t *currentBuffer;
@@ -27,43 +37,7 @@ void REN_Init(viewport_t viewport)
     LAYER1->CFBLR = ((currentViewport.width * pixelSize) << 16) | ((currentViewport.width * pixelSize) + 3);
     LAYER1->CFBLNR = (currentViewport.height);
 
-#if defined TRUE_COLOR
 	LAYER1->PFCR = LTDC_LxPFCR_PF_ARGB8888;
-#elif defined HIGH_COLOR
-	LAYER1->PFCR = LTDC_LxPFCR_PF_RGB565;
-#elif defined PALETTE_COLOR
-
-    uint8_t paletteSize = 8;
-    uint32_t colorPalette[paletteSize] = {
-        0x00000000,
-        0x00FFFFFF,
-        0x00FF0000,
-        0x0000FF00,
-        0x000000FF,
-        0x0000FFFF,
-        0x00FF00FF,
-        0x00FFFF00
-    };
-
-	LAYER1->PFCR = LTDC_LxPFCR_PF_L8;
-
-	for(uint8_t i = 0; i < paletteSize; ++i)
-	{
-		uint32_t color = color_palette[i] & 0x00FFFFFF;
-		uint32_t data = color | (i << 24);
-		LAYER1->CLUTWR = data;
-	}
-
-	for(uint8_t i = paletteSize; i < 256 - paletteSize; ++i)
-	{
-		uint32_t data = (i << 24);
-		LAYER1->CLUTWR = data;
-	}
-
-	LAYER1->CR |= LTDC_LxCR_CLUTEN;
-#else
-    LAYER1->PFCR = LTDC_LxPFCR_PF_L8;
-#endif
 
     frontBuffer = (color_t *)(&_sframebuf);
     backBuffer = frontBuffer + (currentViewport.width * currentViewport.height);
@@ -234,6 +208,17 @@ void REN_DrawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t co
 void REN_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color)
 {
 
+}
+
+void REN_DrawString(const char *string, int x, int y, color_t color)
+{
+    char *ch = string;
+    while(ch != NULL)
+    {
+        char character = *ch;
+
+        ch++;
+    }
 }
 
 void REN_Flip()
