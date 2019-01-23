@@ -5,17 +5,16 @@
 
 typedef struct
 {
-                              // Offest     Description
-  volatile uint32_t MODER;    // 0x00       mode register
-  volatile uint32_t OTYPER;   // 0x04       output type register
-  volatile uint32_t OSPEEDR;  // 0x08       output speed register
-  volatile uint32_t PUPDR;    // 0x0c       pull-up/pull-down register
-  volatile uint32_t IDR;      // 0x10       input data register
-  volatile uint32_t ODR;      // 0x14       output data register
-  volatile uint16_t BSRRL;    // 0x18       bit set/reset low register
-  volatile uint16_t BSRRH;    // 0x1A       bit set/reset high register
-  volatile uint32_t LCKR;     // 0x1C       configuration lock register
-  volatile uint32_t AFR[2];   // 0x20-0x24  alternate function registers
+  volatile uint32_t MODER;
+  volatile uint32_t OTYPER;
+  volatile uint32_t OSPEEDR;
+  volatile uint32_t PUPDR;
+  volatile uint32_t IDR;
+  volatile uint32_t ODR;
+  volatile uint16_t BSRRL;
+  volatile uint16_t BSRRH;
+  volatile uint32_t LCKR;
+  volatile uint32_t AFR[2];
 } GPIO_TypeDef;
 
 #define GPIOA_BASE (AHB1PERIPH_BASE + 0x0000)

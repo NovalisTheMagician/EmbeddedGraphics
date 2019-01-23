@@ -5,37 +5,36 @@
 
 typedef struct
 {
-                                // offset   Description
-    volatile uint32_t CR;       // 0x00     RCC clock control
-    volatile uint32_t PLLCFGR;  // 0x04     RCC PLL configuration
-    volatile uint32_t CFGR;     // 0x08     RCC clock configuration
-    volatile uint32_t CIR;      // 0x0c     RCC clock interrupt
-    volatile uint32_t AHB1RSTR; // 0x10     RCC AHB1 peripheral reset
-    volatile uint32_t AHB2RSTR; // 0x14     RCC AHB2 peripheral reset
-    volatile uint32_t AHB3RSTR; // 0x18     RCC AHB3 peripheral reset
-    uint32_t RESERVED0;         // 0x1c     Reserved
-    volatile uint32_t APB1RSTR; // 0x20     RCC APB1 peripheral reset
-    volatile uint32_t APB2RSTR; // 0x24     RCC APB2 peripheral reset
-    uint32_t RESERVED1[2];      // 0x28-0x2C    Reserved
-    volatile uint32_t AHB1ENR;  // 0x30     RCC AHB1 peripheral clock
-    volatile uint32_t AHB2ENR;  // 0x34     RCC AHB2 peripheral clock
-    volatile uint32_t AHB3ENR;  // 0x38     RCC AHB3 peripheral clock
-    uint32_t RESERVED2;         // 0x3c     Reserved
-    volatile uint32_t APB1ENR;  // 0x40     RCC APB1 peripheral clock enable
-    volatile uint32_t APB2ENR;  // 0x44     RCC APB2 peripheral clock enable
-    uint32_t RESERVED3[2];      // 0x48-0x4c --Reserved--
-    volatile uint32_t AHB1LPENR; // 0x50    RCC AHB1 p-clock enable in LP mode 
-    volatile uint32_t AHB2LPENR; // 0x54    RCC AHB2 p-clock enable in LP mode
-    volatile uint32_t AHB3LPENR; // 0x58    RCC AHB3 p-clock enable in LP mode
-    uint32_t RESERVED4;         // 0x5c     --Reserved--
-    volatile uint32_t APB1LPENR; // 0x60    RCC APB1 p-clock enable in LP mode
-    volatile uint32_t APB2LPENR; // 0x64    RCC APB2 p-clock enable in LP mode
-    uint32_t RESERVED5[2];      // 0x68-0x6c    Reserved
-    volatile uint32_t BDCR;     // 0x70     RCC Backup domain control
-    volatile uint32_t CSR;      // 0x74     RCC clock control & status
-    uint32_t RESERVED6[2];      // 0x78-0x7c    Reserved
-    volatile uint32_t SSCGR;    // 0x80     RCC spread spectrum clock generation
-    volatile uint32_t PLLI2SCFGR; // 0x84   RCC PLLI2S configuration 
+    volatile uint32_t CR;
+    volatile uint32_t PLLCFGR;
+    volatile uint32_t CFGR;
+    volatile uint32_t CIR;
+    volatile uint32_t AHB1RSTR;
+    volatile uint32_t AHB2RSTR;
+    volatile uint32_t AHB3RSTR;
+    uint32_t RESERVED0;
+    volatile uint32_t APB1RSTR;
+    volatile uint32_t APB2RSTR;
+    uint32_t RESERVED1[2];
+    volatile uint32_t AHB1ENR;
+    volatile uint32_t AHB2ENR;
+    volatile uint32_t AHB3ENR;
+    uint32_t RESERVED2;
+    volatile uint32_t APB1ENR;
+    volatile uint32_t APB2ENR;
+    uint32_t RESERVED3[2];
+    volatile uint32_t AHB1LPENR; 
+    volatile uint32_t AHB2LPENR;
+    volatile uint32_t AHB3LPENR;
+    uint32_t RESERVED4;
+    volatile uint32_t APB1LPENR;
+    volatile uint32_t APB2LPENR;
+    uint32_t RESERVED5[2];
+    volatile uint32_t BDCR;
+    volatile uint32_t CSR;
+    uint32_t RESERVED6[2];
+    volatile uint32_t SSCGR;
+    volatile uint32_t PLLI2SCFGR;
     volatile uint32_t PLLSAICFGR;
     volatile uint32_t DCKCFGR1;
     volatile uint32_t DCKCFGR2;

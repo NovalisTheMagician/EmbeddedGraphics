@@ -22,8 +22,6 @@ void led_off(uint32_t led);
 void blink(int amount, uint32_t led);
 void blink_fast(int amount, uint32_t led);
 
-int lerp(int a, int b, float f);
-
 int main()
 {
     GPIO_Conf(GPIOI, LED1, GPIO_MODE_OUT, GPIO_OTYPE_PUSHPULL, GPIO_OSPEED_VERYHIGHSPEED, GPIO_PUD_NONE);
@@ -52,13 +50,14 @@ int main()
 
         //draw state
         REN_Clear(clearColor);
-        //REN_DrawRect(0, 0, WIDTH, HEIGHT, 255);
+        REN_DrawRect(0, 0, WIDTH, HEIGHT, COL_MAGENTA);
 
         REN_FillRect(x, y, 16, 16, COL_WHITE);
 
         //REN_FillRect(100, 100, 32, 32, COL_GREEN);
 
         REN_FillRect(0, 200, 20, 70, COL_GREEN);
+        REN_DrawRect(0, 200, 20, 70, COL_YELLOW);
 
         REN_DrawLine(100, 100, 200, 100, COL_RED);
         REN_DrawLine(100, 100, 100, 200, COL_RED);
@@ -71,8 +70,8 @@ int main()
         REN_DrawLine(100, 100, 200, 150, COL_BLUE);
         REN_DrawLine(100, 100, 150, 200, COL_BLUE);
 
-        REN_FillTriangle(200, 200, 300, 270, 250, 250, COL_BLUE);
-        REN_DrawTriangle(200, 200, 300, 270, 250, 250, COL_CYAN);
+        REN_FillTriangle(200, 200, 300, 270, 150, 250, COL_RED);
+        REN_DrawTriangle(200, 200, 300, 270, 150, 250, COL_MAGENTA);
 
         REN_FillCircle(WIDTH / 2, HEIGHT / 2, 40, COL_BLUE);
         REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 40, COL_CYAN);

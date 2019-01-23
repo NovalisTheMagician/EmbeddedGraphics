@@ -5,9 +5,8 @@
 
 typedef struct
 {
-                                 // offset   Description
-    volatile uint32_t CR1;        // 0x00     PWR power control register
-    volatile uint32_t CSR1;       // 0x04     PWR power control/status register
+    volatile uint32_t CR1;
+    volatile uint32_t CSR1;
     volatile uint32_t CR2;
     volatile uint32_t CSR2;
 } PWR_TypeDef;

@@ -48,12 +48,12 @@ void REN_Init(viewport_t viewport)
 
 void REN_Clear(color_t color)
 {
-   uint32_t width = currentViewport.width;
-   uint32_t height = currentViewport.height;
-   for(int i = 0; i < width * height; ++i)
-   {
+    uint32_t width = currentViewport.width;
+    uint32_t height = currentViewport.height;
+    for(int i = 0; i < width * height; ++i)
+    {
         currentBuffer[i] = color;
-   }
+    }
 }
 
 void REN_PutPixel(int x, int y, color_t color)
@@ -154,7 +154,7 @@ void REN_DrawCircle(int x, int y, int radius, color_t color)
     int _y = 0;
     int dx = 1;
     int dy = 1;
-    int err = dx - (radius << 1);
+    int err = dx - (radius / 2);
 
     while(_x >= _y)
     {
@@ -178,7 +178,7 @@ void REN_DrawCircle(int x, int y, int radius, color_t color)
         {
             _x--;
             dx += 2;
-            err += dx - (radius << 1);
+            err += dx - (radius / 2);
         }
     }
 }
@@ -248,14 +248,14 @@ void REN_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t co
 
 static void BlitGlyph(int x, int y, int glyph, color_t color)
 {
-    for(int gy = 0; gy < GLYPH_HEIGHT; ++gy)
+    for(int _y = 0; _y < GLYPH_HEIGHT; ++_y)
     {
-        for(int gx = 0; gx < GLYPH_WIDTH; ++gx)
+        for(int _x = 0; _x < GLYPH_WIDTH; ++_x)
         {
-            int index =  glyph + gx + gy * GLYPH_WIDTH;
+            int index =  glyph + _x + _y * GLYPH_WIDTH;
             uint32_t fontColor = FONT[index];
             if(fontColor == 0xFF000000)
-                REN_PutPixel(x + gx, y + gy, color);
+                REN_PutPixel(x + _x, y + _y, color);
         }
     }
 }
@@ -274,13 +274,13 @@ void REN_DrawString(const char *string, int x, int y, color_t color)
         char character = *ch;
         if(character >= 'A' && character <= 'Z')
         {
-            int glyphIndex = (character - 'A') * GLYPH_SIZE;
-            BlitGlyph(x + xOffset, y, glyphIndex, color);
+            int glyphOffset = (character - 'A') * GLYPH_SIZE;
+            BlitGlyph(x + xOffset, y, glyphOffset, color);
         }
         else if(character >= '0' && character <= '9')
         {
-            int glyphIndex = ((character - '0') + 26) * GLYPH_SIZE;
-            BlitGlyph(x + xOffset, y, glyphIndex, color);
+            int glyphOffset = ((character - '0') + 26) * GLYPH_SIZE;
+            BlitGlyph(x + xOffset, y, glyphOffset, color);
         }
 
         xOffset += GLYPH_WIDTH;
