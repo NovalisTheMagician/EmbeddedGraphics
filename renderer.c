@@ -7,15 +7,12 @@
 
 extern unsigned long _sframebuf;
 
-static const int FONT_WIDTH = 10;
-static const int FONT_HEIGHT = 16;
-static const int NUM_CHARS = 32;
-/*
-static const uint8_t FONT[NUM_CHARS][FONT_SIZE * FONT_SIZE] = {
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {1}
+#define GLYPH_WIDTH 10
+#define GLYPH_HEIGHT 16
+#define NUM_CHARS 36
+static uint32_t FONT[GLYPH_WIDTH * GLYPH_HEIGHT * NUM_CHARS] = {
+#include "font.inc"
 };
-*/
 
 static color_t *frontBuffer;
 static color_t *backBuffer;
@@ -210,13 +207,44 @@ void REN_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t co
 
 }
 
+static void BlitGlyph(int x, int y, int glyph, color_t color)
+{
+    for(int gy = 0; gy < GLYPH_HEIGHT; ++gy)
+    {
+        for(int gx = 0; gx < GLYPH_WIDTH; ++gx)
+        {
+            int index =  glyph + gx + gy * GLYPH_WIDTH;
+            uint32_t fontColor = FONT[index];
+            if(fontColor == 0xFF000000)
+                REN_PutPixel(x + gx, y + gy, color);
+        }
+    }
+}
+
+#include "gpio.h"
+
 void REN_DrawString(const char *string, int x, int y, color_t color)
 {
-    char *ch = string;
-    while(ch != NULL)
+    int GLYPH_SIZE = GLYPH_WIDTH * GLYPH_HEIGHT;
+
+    int xOffset = 0;
+
+    const char *ch = string;
+    while(*ch != '\0')
     {
         char character = *ch;
+        if(character >= 'A' && character <= 'Z')
+        {
+            int glyphIndex = (character - 'A') * GLYPH_SIZE;
+            BlitGlyph(x + xOffset, y, glyphIndex, color);
+        }
+        else if(character >= '0' && character <= '9')
+        {
+            int glyphIndex = ((character - '0') + 26) * GLYPH_SIZE;
+            BlitGlyph(x + xOffset, y, glyphIndex, color);
+        }
 
+        xOffset += GLYPH_WIDTH;
         ch++;
     }
 }

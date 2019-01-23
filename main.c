@@ -73,8 +73,8 @@ int main()
 
         REN_DrawTriangle(200, 200, 300, 270, 250, 250, COL_CYAN);
 
-        REN_FillCircle(WIDTH / 2, HEIGHT / 2, 30, COL_BLUE);
-        REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 30, COL_CYAN);
+        REN_FillCircle(WIDTH / 2, HEIGHT / 2, 100, COL_BLUE);
+        REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 100, COL_CYAN);
 
         /*
         for(int ny = 0; ny < HEIGHT; ++ny)
@@ -88,14 +88,15 @@ int main()
             }
         }
         */
+        
+        REN_DrawString("HELLO WORLD", 0, 0, COL_WHITE);
+        REN_DrawString("HELLO WORLD", 0, 16, COL_RED);
+        REN_DrawString("HELLO WORLD", 0, 32, COL_GREEN);
+        REN_DrawString("HELLO WORLD", 0, 48, COL_BLUE);
+        REN_DrawString("HELLO WORLD", 0, 64, COL_CYAN);
 
         REN_Flip();
     }
-}
-
-int lerp(int a, int b, float f)
-{
-    return (int)((a * (1.0f - f)) + (b * f));
 }
 
 int n = 1000;
