@@ -45,8 +45,8 @@ SECTIONS
     {
         _sframebuf = .;
         *(.framebuffer .framebuffer.*)
-        _eframebuf = .;
     } >FRAMEBUFFER
+    _eframebuf = ORIGIN(FRAMEBUFFER) + LENGTH(FRAMEBUFFER);
 
     .sdram :
     {
