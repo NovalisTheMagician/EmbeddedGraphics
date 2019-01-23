@@ -202,9 +202,48 @@ void REN_DrawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t co
     REN_DrawLine(x2, y2, x0, y0, color);
 }
 
+static int min(int a, int b)
+{
+    return a < b ? a : b;
+}
+
+static int max(int a, int b)
+{
+    return a > b ? a : b;
+}
+
+static int halfspace(int ax, int ay, int bx, int by, int cx, int cy)
+{
+    return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+}
+
 void REN_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color)
 {
+    uint32_t width = currentViewport.width;
+    uint32_t height = currentViewport.height;
 
+    int minX = min(x0, min(x1, x2));
+    int minY = min(y0, min(y1, y2));
+    int maxX = max(x0, max(x1, x2));
+    int maxY = max(y0, max(y1, y2));
+
+    minX = max(minX, 0);
+    minY = max(minY, 0);
+    maxX = min(maxX, width - 1);
+    maxY = min(maxY, height - 1);
+
+    for(int py = minY; py < maxY; ++py)
+    {
+        for(int px = minX; px < maxX; ++px)
+        {
+            int w0 = halfspace(x1, y1, x2, y2, px, py);
+            int w1 = halfspace(x2, y2, x0, y0, px, py);
+            int w2 = halfspace(x0, y0, x1, y1, px, py);
+
+            if(w0 >= 0 && w1 >= 0 && w2 >= 0)
+                REN_PutPixel(px, py, color);
+        }
+    }
 }
 
 static void BlitGlyph(int x, int y, int glyph, color_t color)
