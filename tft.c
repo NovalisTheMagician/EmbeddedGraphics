@@ -37,6 +37,8 @@ void TFT_Init()
     LTDC->TWCR = ((HSYNC + HBP + LCD_WIDTH + HFP - 1) << 16) | (VSYNC + VBP + LCD_HEIGHT + VFP - 1);
 	LTDC->BCCR = (255 << 16) | 255;
 
+	LTDC->IER = (1 << 3);
+
     //LTDC->SRCR = LTDC_SRCR_IMR;
 
     LTDC->GCR |= LTDC_GCR_LTDCEN;

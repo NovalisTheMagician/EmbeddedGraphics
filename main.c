@@ -5,7 +5,7 @@
 #include "systick.h"
 #include "delay.h"
 
-#include "colors32.h"
+#include "colors16.h"
 
 #include <math.h>
 
@@ -59,22 +59,22 @@ int main()
         REN_FillRect(0, 200, 20, 70, COL_GREEN);
         REN_DrawRect(0, 200, 20, 70, COL_YELLOW);
 
-        REN_DrawLine(100, 100, 200, 100, COL_RED);
-        REN_DrawLine(100, 100, 100, 200, COL_RED);
-        REN_DrawLine(100, 100, 0, 100, COL_RED);
-        REN_DrawLine(100, 100, 100, 0, COL_RED);
+        //REN_DrawLine(100, 100, 200, 100, COL_RED);
+        //REN_DrawLine(100, 100, 100, 200, COL_RED);
+        //REN_DrawLine(100, 100, 0, 100, COL_RED);
+        //REN_DrawLine(100, 100, 100, 0, COL_RED);
 
-        REN_DrawLine(100, 100, 200, 200, COL_GREEN);
-        REN_DrawLine(100, 100, 0, 0, COL_GREEN);
+        //REN_DrawLine(100, 100, 200, 200, COL_GREEN);
+        //REN_DrawLine(100, 100, 0, 0, COL_GREEN);
 
-        REN_DrawLine(100, 100, 200, 150, COL_BLUE);
-        REN_DrawLine(100, 100, 150, 200, COL_BLUE);
+        //REN_DrawLine(100, 100, 200, 150, COL_BLUE);
+        //REN_DrawLine(100, 100, 150, 200, COL_BLUE);
 
-        REN_FillTriangle(200, 200, 300, 270, 150, 250, COL_RED);
-        REN_DrawTriangle(200, 200, 300, 270, 150, 250, COL_MAGENTA);
+        //REN_FillTriangle(200, 200, 300, 270, 150, 250, COL_RED);
+        //REN_DrawTriangle(200, 200, 300, 270, 150, 250, COL_MAGENTA);
 
-        REN_FillCircle(WIDTH / 2, HEIGHT / 2, 40, COL_BLUE);
-        REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 40, COL_CYAN);
+        //REN_FillCircle(WIDTH / 2, HEIGHT / 2, 40, COL_BLUE);
+        //REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 40, COL_CYAN);
 
         /*
         for(int ny = 0; ny < HEIGHT; ++ny)
@@ -89,13 +89,13 @@ int main()
         }
         */
         
-        REN_DrawString("HELLO WORLD", 0, 0, COL_WHITE);
-        REN_DrawString("HELLO WORLD", 0, 16, COL_RED);
-        REN_DrawString("HELLO WORLD", 0, 32, COL_GREEN);
-        REN_DrawString("HELLO WORLD", 0, 48, COL_BLUE);
-        REN_DrawString("HELLO WORLD", 0, 64, COL_CYAN);
-        REN_DrawString("HELLO WORLD", 0, 80, COL_MAGENTA);
-        REN_DrawString("HELLO WORLD", 0, 96, COL_YELLOW);
+        //REN_DrawString("HELLO WORLD", 0, 0, COL_WHITE);
+        //REN_DrawString("HELLO WORLD", 0, 16, COL_RED);
+        //REN_DrawString("HELLO WORLD", 0, 32, COL_GREEN);
+        //REN_DrawString("HELLO WORLD", 0, 48, COL_BLUE);
+        //REN_DrawString("HELLO WORLD", 0, 64, COL_CYAN);
+        //REN_DrawString("HELLO WORLD", 0, 80, COL_MAGENTA);
+        //REN_DrawString("HELLO WORLD", 0, 96, COL_YELLOW);
 
         REN_Flip();
     }

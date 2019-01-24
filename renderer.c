@@ -7,6 +7,7 @@
 
 #include "rcc.h"
 #include "dma2d.h"
+#include "nvic.h"
 
 extern unsigned long _sframebuf;
 
@@ -31,6 +32,7 @@ void REN_Init(viewport_t viewport)
     currentViewport.height = viewport.height;
 
     size_t pixelSize = sizeof(color_t);
+    //size_t pixelSize = sizeof(uint16_t);
 
     LAYER1->WHPCR = ((HSYNC + HBP + currentViewport.width - 1) << 16) | (HSYNC + HBP + currentViewport.x);
     LAYER1->WVPCR = ((VSYNC + VBP + currentViewport.height - 1) << 16) | (VSYNC + VBP + currentViewport.y);
@@ -38,6 +40,7 @@ void REN_Init(viewport_t viewport)
     LAYER1->CFBLNR = (currentViewport.height);
 
 	LAYER1->PFCR = LTDC_LxPFCR_PF_ARGB8888;
+    //LAYER1->PFCR = LTDC_LxPFCR_PF_RGB565;
 
     frontBuffer = (color_t *)(&_sframebuf);
     backBuffer = frontBuffer + (currentViewport.width * currentViewport.height);
@@ -50,7 +53,9 @@ void REN_Init(viewport_t viewport)
 
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
 
-    DMA2D->OPFCCR = PFC_ARGB8888;
+    NVIC_EnableIRQ(LCD_IRQn);
+
+    //DMA2D->AMTCR = (0xFF << 8) | 1;
 }
 
 void REN_Clear(color_t color)
@@ -58,17 +63,26 @@ void REN_Clear(color_t color)
     uint16_t width = currentViewport.width;
     uint16_t height = currentViewport.height;
 
+    DMA2D->OPFCCR = PFC_ARGB8888;
     DMA2D->OCOLR = color;
     DMA2D->OMAR = (uint32_t)currentBuffer;
     DMA2D->NLR = (width << 16) | height;
+    DMA2D->OOR = 0;
 
-    DMA2D->CR |= DMA2D_CR_MODE_REG2MEM;
-    DMA2D->CR |= DMA2D_CR_START;
-    while((DMA2D->CR & 1) == DMA2D_CR_START);
+    DMA2D->CR = DMA2D_CR_MODE_REG2MEM | DMA2D_CR_START;
+    while((DMA2D->CR & DMA2D_CR_START));
+
+    /*
+    uint16_t width = currentViewport.width;
+    uint16_t height = currentViewport.height;
+    for(int i = 0; i < width * height; ++i)
+        currentBuffer[i] = color;
+    */
 }
 
 void REN_PutPixel(int x, int y, color_t color)
 {
+    /*
     uint32_t width = currentViewport.width;
     uint32_t height = currentViewport.height;
 
@@ -77,22 +91,45 @@ void REN_PutPixel(int x, int y, color_t color)
 
     uint32_t offset = ((y * width) + x);
     currentBuffer[offset] = color;
+    */
+    uint32_t width = currentViewport.width;
+
+    DMA2D->OPFCCR = PFC_ARGB8888;
+    DMA2D->OCOLR = color;
+    DMA2D->OMAR = (uint32_t)(currentBuffer + (x + y * width));
+    DMA2D->NLR = (1 << 16) | 1;
+    DMA2D->OOR = width - 1;
+
+    DMA2D->CR = DMA2D_CR_MODE_REG2MEM | DMA2D_CR_START;
+    while((DMA2D->CR & DMA2D_CR_START));
 }
 
 void REN_VerticalLine(int x, int y, int length, color_t color)
 {
-    for(int cy = 0; cy < length; ++cy)
-    {
-        REN_PutPixel(x, cy + y, color);
-    }
+    uint32_t width = currentViewport.width;
+
+    DMA2D->OPFCCR = PFC_ARGB8888;
+    DMA2D->OCOLR = color;
+    DMA2D->OMAR = (uint32_t)(currentBuffer + (x + y * width));
+    DMA2D->NLR = (1 << 16) | length;
+    DMA2D->OOR = width - 1;
+
+    DMA2D->CR = DMA2D_CR_MODE_REG2MEM | DMA2D_CR_START;
+    while((DMA2D->CR & DMA2D_CR_START));
 }
 
 void REN_HorizontalLine(int x, int y, int length, color_t color)
 {
-    for(int cx = 0; cx < length; ++cx)
-    {
-        REN_PutPixel(cx + x, y, color);
-    }
+    uint32_t width = currentViewport.width;
+
+    DMA2D->OPFCCR = PFC_RGB565;
+    DMA2D->OCOLR = color;
+    DMA2D->OMAR = (uint32_t)(currentBuffer + (x + y * width));
+    DMA2D->NLR = (length << 16) | 1;
+    DMA2D->OOR = width;
+
+    DMA2D->CR = DMA2D_CR_MODE_REG2MEM | DMA2D_CR_START;
+    while((DMA2D->CR & DMA2D_CR_START));
 }
 
 void REN_DrawLine(int x0, int y0, int x1, int y1, color_t color)
@@ -271,8 +308,6 @@ static void BlitGlyph(int x, int y, int glyph, color_t color)
     }
 }
 
-#include "gpio.h"
-
 void REN_DrawString(const char *string, int x, int y, color_t color)
 {
     int GLYPH_SIZE = GLYPH_WIDTH * GLYPH_HEIGHT;
@@ -299,10 +334,14 @@ void REN_DrawString(const char *string, int x, int y, color_t color)
     }
 }
 
+static volatile int vblank = 0;
+
 void REN_Flip()
 {
     LAYER1->CFBAR = (uint32_t)currentBuffer;
-    LTDC->SRCR = LTDC_SRCR_IMR;
+    LTDC->SRCR = LTDC_SRCR_VBR;
+    while(!vblank);
+    vblank = 0;
 
     if(currentBuffer == frontBuffer)
         currentBuffer = backBuffer;
@@ -310,7 +349,8 @@ void REN_Flip()
         currentBuffer = frontBuffer;
 }
 
-void DMA2DHandler()
+void LCDHandler()
 {
-
+    vblank = 1;
+    LTDC->ICR = (1 << 3);
 }

@@ -58,7 +58,7 @@ void USART1Handler()        __attribute__ ((interrupt, weak, alias("UnusedHandle
 void USART2Handler()        __attribute__ ((interrupt, weak, alias("UnusedHandler")));
 void USART3Handler()        __attribute__ ((interrupt, weak, alias("UnusedHandler")));
 
-void EXTI5_10Handler()      __attribute__ ((interrupt, weak, alias("UnusedHandler")));
+void EXTI15_10Handler()      __attribute__ ((interrupt, weak, alias("UnusedHandler")));
 
 void RTCAlarmHandler()      __attribute__ ((interrupt, weak, alias("UnusedHandler")));
 

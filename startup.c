@@ -39,7 +39,7 @@ static void DefaultHandler()
 }
 
 __attribute__ ((section(".vectors"), used))
-void (* const _vectors[113])(void) = 
+void (* const _vectors[114])(void) = 
 {
     (void *)&_estack,
     Startup,
@@ -97,7 +97,7 @@ void (* const _vectors[113])(void) =
     USART1Handler,
     USART2Handler,
     USART3Handler,
-    EXTI5_10Handler,
+    EXTI15_10Handler,
     RTCAlarmHandler,
     OTGFSWakeuphandler,
     TIM8BRK_TIM12Handler,
