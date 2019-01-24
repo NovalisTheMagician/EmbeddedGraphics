@@ -5,12 +5,15 @@
 
 #include "tft.h"
 
+#include "rcc.h"
+#include "dma2d.h"
+
 extern unsigned long _sframebuf;
 
 #define GLYPH_WIDTH 10
 #define GLYPH_HEIGHT 16
 #define NUM_CHARS 36
-static uint32_t FONT[GLYPH_WIDTH * GLYPH_HEIGHT * NUM_CHARS] = {
+static const uint32_t FONT[GLYPH_WIDTH * GLYPH_HEIGHT * NUM_CHARS] = {
 #include "font.inc"
 };
 
@@ -44,16 +47,24 @@ void REN_Init(viewport_t viewport)
     LTDC->SRCR = LTDC_SRCR_IMR;
 
     LAYER1->CR |= LTDC_LxCR_LEN;
+
+    RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
+
+    DMA2D->OPFCCR = PFC_ARGB8888;
 }
 
 void REN_Clear(color_t color)
 {
-    uint32_t width = currentViewport.width;
-    uint32_t height = currentViewport.height;
-    for(int i = 0; i < width * height; ++i)
-    {
-        currentBuffer[i] = color;
-    }
+    uint16_t width = currentViewport.width;
+    uint16_t height = currentViewport.height;
+
+    DMA2D->OCOLR = color;
+    DMA2D->OMAR = (uint32_t)currentBuffer;
+    DMA2D->NLR = (width << 16) | height;
+
+    DMA2D->CR |= DMA2D_CR_MODE_REG2MEM;
+    DMA2D->CR |= DMA2D_CR_START;
+    while((DMA2D->CR & 1) == DMA2D_CR_START);
 }
 
 void REN_PutPixel(int x, int y, color_t color)
@@ -297,4 +308,9 @@ void REN_Flip()
         currentBuffer = backBuffer;
     else
         currentBuffer = frontBuffer;
+}
+
+void DMA2DHandler()
+{
+
 }
