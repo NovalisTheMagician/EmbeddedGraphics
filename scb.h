@@ -11,19 +11,26 @@ typedef struct
     volatile uint32_t AIRCR;
     volatile uint32_t SCR;
     volatile uint32_t CCR;
-    volatile uint32_t SHPR1;
-    volatile uint32_t SHPR2;
-    volatile uint32_t SHPR3;
-    volatile uint32_t SHCSR;
+    volatile uint8_t SHPR[12];
     volatile uint32_t CFSR;
     volatile uint32_t HFSR;
-    uint32_t RESERVED1;
+    volatile uint32_t DFSR;
     volatile uint32_t MMFAR;
     volatile uint32_t BFAR;
-    uint32_t RESERVED2;
+    volatile uint32_t AFSR;
+    volatile uint32_t PFR[2];
+    volatile uint32_t DFR;
+    volatile uint32_t ADR;
+    volatile uint32_t MMFR[4];
+    volatile uint32_t ISAR[5];
 } SCB_Typedef;
 
 #define SCB_BASE ((uint32_t) 0xE000ED00)
 #define SCB ((SCB_Typedef *) SCB_BASE)
+
+#define SCB_AIRCR_VECTKEY       ((uint32_t)(0x5FA << 16))
+#define SCB_AIRCR_SYSRESETRQ    ((uint32_t)(1 << 2))
+
+void SCB_SystemReset();
 
 #endif

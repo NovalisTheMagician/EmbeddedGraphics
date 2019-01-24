@@ -5,6 +5,7 @@
 #include "tft.h"
 #include "systick.h"
 #include "delay.h"
+#include "scb.h"
 
 #include "interrupts.h"
 
@@ -212,5 +213,5 @@ void* _sbrk(int incr)
 __attribute__((weak))
 void _exit(int status)
 {
-    while(1);
+    SCB_SystemReset();
 }
