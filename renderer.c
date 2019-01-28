@@ -1,7 +1,7 @@
 #include "renderer.h"
 
-#include "math.h"
-#include "stdlib.h"
+#include <math.h>
+#include <stdlib.h>
 
 #include "tft.h"
 
@@ -75,7 +75,7 @@ void REN_PutPixel(int x, int y, color_t color)
 
     DMA2D->OPFCCR = PFC_ARGB8888;
     DMA2D->OCOLR = color;
-    DMA2D->OMAR = (uint32_t)(currentBuffer + (x + y * width));
+    DMA2D->OMAR = (uint32_t)&currentBuffer[x + y * width];
     DMA2D->NLR = (1 << 16) | 1;
     DMA2D->OOR = width - 1;
 
@@ -86,10 +86,25 @@ void REN_PutPixel(int x, int y, color_t color)
 void REN_VerticalLine(int x, int y, int length, color_t color)
 {
     uint32_t width = currentViewport.width;
+    uint32_t height = currentViewport.height;
+
+    if(length <= 0 || x >= (int)width || y >= (int)height || x < 0)
+        return;
+
+    if(y < 0)
+    {
+        length += y;
+        y = 0;
+    }
+
+    if((y + length) >= height)
+    {
+        length -= (y + length) - height;
+    }
 
     DMA2D->OPFCCR = PFC_ARGB8888;
     DMA2D->OCOLR = color;
-    DMA2D->OMAR = (uint32_t)(currentBuffer + (x + y * width));
+    DMA2D->OMAR = (uint32_t)&currentBuffer[x + y * width];
     DMA2D->NLR = (1 << 16) | length;
     DMA2D->OOR = width - 1;
 
@@ -100,10 +115,25 @@ void REN_VerticalLine(int x, int y, int length, color_t color)
 void REN_HorizontalLine(int x, int y, int length, color_t color)
 {
     uint32_t width = currentViewport.width;
+    uint32_t height = currentViewport.height;
+
+    if(length <= 0 || x >= (int)width || y >= (int)height || y < 0)
+        return;
+
+    if(x < 0)
+    {
+        length += x;
+        x = 0;
+    }
+
+    if((x + length) >= width)
+    {
+        length -= (x + length) - width;
+    }
 
     DMA2D->OPFCCR = PFC_ARGB8888;
     DMA2D->OCOLR = color;
-    DMA2D->OMAR = (uint32_t)(currentBuffer + (x + y * width));
+    DMA2D->OMAR = (uint32_t)&currentBuffer[x + y * width];
     DMA2D->NLR = (length << 16) | 1;
     DMA2D->OOR = width;
 
@@ -169,10 +199,42 @@ void REN_DrawRect(int x, int y, int width, int height, color_t color)
 
 void REN_FillRect(int x, int y, int width, int height, color_t color)
 {
-    for(int cy = 0; cy < height; ++cy)
+    uint32_t screenWidth = currentViewport.width;
+    uint32_t screenHeight = currentViewport.height;
+
+    if((width <= 0) || (height <= 0) || (x >= (int)screenWidth) || (y >= (int)screenHeight))
+        return;
+
+    if(x < 0)
     {
-        REN_HorizontalLine(x, cy + y, width, color);
+        width += x;
+        x = 0;
     }
+
+    if(y < 0)
+    {
+        height += y;
+        y = 0;
+    }
+
+    if((x + width) >= screenWidth)
+    {
+        width -= (x + width) - screenWidth;
+    }
+
+    if((y + height) >= screenHeight)
+    {
+        height -= (y + height) - screenHeight;
+    }
+
+    DMA2D->OPFCCR = PFC_ARGB8888;
+    DMA2D->OCOLR = color;
+    DMA2D->OMAR = (uint32_t)&currentBuffer[x + y * screenWidth];
+    DMA2D->NLR = (width << 16) | height;
+    DMA2D->OOR = screenWidth - width;
+
+    DMA2D->CR = DMA2D_CR_MODE_REG2MEM | DMA2D_CR_START;
+    while((DMA2D->CR & DMA2D_CR_START));
 }
 
 void REN_DrawCircle(int x, int y, int radius, color_t color)
