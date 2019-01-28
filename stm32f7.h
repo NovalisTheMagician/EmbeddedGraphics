@@ -2,6 +2,7 @@
 #define STM32F7_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define PERIPH_BASE ((uint32_t)0x40000000)
 

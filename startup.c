@@ -214,4 +214,5 @@ __attribute__((weak))
 void _exit(int status)
 {
     SCB_SystemReset();
+    while(1);
 }
