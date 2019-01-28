@@ -11,6 +11,8 @@
 
 #include "renderer.h"
 
+#include <stdio.h>
+
 #define LED1 1
 
 #define WIDTH 480
@@ -35,10 +37,32 @@ int main()
     uint32_t clearColor = COL_BLACK;
 
     int x = 0, y = 80;
-    int dx = 2, dy = 2;
+    int dx = 1, dy = 2;
+
+    uint32_t current = millis();
+    uint32_t last = current;
+
+    uint32_t count = 0;
+    int fps = 0;
+
+    int fpsVal = 0;
 
     while(1)
     {
+        current = millis();
+        uint32_t delta = current - last;
+        last = current;
+
+        count += delta;
+        fps++;
+
+        if(count >= 1000)
+        {
+            count = 0;
+            fpsVal = fps;
+            fps = 0;
+        }
+
         //update state
         x += dx;
         y += dy;
@@ -54,21 +78,19 @@ int main()
 
         REN_FillRect(x, y, 16, 16, COL_WHITE);
 
-        //REN_FillRect(100, 100, 32, 32, COL_GREEN);
-
         REN_FillRect(0, 200, 20, 70, COL_GREEN);
         REN_DrawRect(0, 200, 20, 70, COL_YELLOW);
 
-        //REN_DrawLine(100, 100, 200, 100, COL_RED);
-        //REN_DrawLine(100, 100, 100, 200, COL_RED);
-        //REN_DrawLine(100, 100, 0, 100, COL_RED);
-        //REN_DrawLine(100, 100, 100, 0, COL_RED);
+        REN_DrawLine(100, 100, 200, 100, COL_RED);
+        REN_DrawLine(100, 100, 100, 200, COL_RED);
+        REN_DrawLine(100, 100, 0, 100, COL_RED);
+        REN_DrawLine(100, 100, 100, 0, COL_RED);
 
-        //REN_DrawLine(100, 100, 200, 200, COL_GREEN);
-        //REN_DrawLine(100, 100, 0, 0, COL_GREEN);
+        REN_DrawLine(100, 100, 200, 200, COL_GREEN);
+        REN_DrawLine(100, 100, 0, 0, COL_GREEN);
 
-        //REN_DrawLine(100, 100, 200, 150, COL_BLUE);
-        //REN_DrawLine(100, 100, 150, 200, COL_BLUE);
+        REN_DrawLine(100, 100, 200, 150, COL_BLUE);
+        REN_DrawLine(100, 100, 150, 200, COL_BLUE);
 
         //REN_FillTriangle(200, 200, 300, 270, 150, 250, COL_RED);
         //REN_DrawTriangle(200, 200, 300, 270, 150, 250, COL_MAGENTA);
@@ -88,14 +110,10 @@ int main()
             }
         }
         */
-        
-        REN_DrawString("HELLO WORLD", 0, 0, COL_WHITE);
-        REN_DrawString("HELLO WORLD", 0, 16, COL_RED);
-        REN_DrawString("HELLO WORLD", 0, 32, COL_GREEN);
-        REN_DrawString("HELLO WORLD", 0, 48, COL_BLUE);
-        REN_DrawString("HELLO WORLD", 0, 64, COL_CYAN);
-        REN_DrawString("HELLO WORLD", 0, 80, COL_MAGENTA);
-        REN_DrawString("HELLO WORLD", 0, 96, COL_YELLOW);
+
+        char buffer[8];
+        sprintf(buffer, "FPS %d", fpsVal);
+        REN_DrawString(buffer, 1, 1, COL_YELLOW);
 
         REN_Flip(true);
     }
