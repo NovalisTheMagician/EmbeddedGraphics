@@ -5,7 +5,7 @@
 #include "systick.h"
 #include "delay.h"
 
-#include "colors16.h"
+#include "colors32.h"
 
 #include <math.h>
 
@@ -35,7 +35,7 @@ int main()
     uint32_t clearColor = COL_BLACK;
 
     int x = 0, y = 80;
-    int dx = 1, dy = 1;
+    int dx = 2, dy = 2;
 
     while(1)
     {
@@ -89,15 +89,15 @@ int main()
         }
         */
         
-        //REN_DrawString("HELLO WORLD", 0, 0, COL_WHITE);
-        //REN_DrawString("HELLO WORLD", 0, 16, COL_RED);
-        //REN_DrawString("HELLO WORLD", 0, 32, COL_GREEN);
-        //REN_DrawString("HELLO WORLD", 0, 48, COL_BLUE);
-        //REN_DrawString("HELLO WORLD", 0, 64, COL_CYAN);
-        //REN_DrawString("HELLO WORLD", 0, 80, COL_MAGENTA);
-        //REN_DrawString("HELLO WORLD", 0, 96, COL_YELLOW);
+        REN_DrawString("HELLO WORLD", 0, 0, COL_WHITE);
+        REN_DrawString("HELLO WORLD", 0, 16, COL_RED);
+        REN_DrawString("HELLO WORLD", 0, 32, COL_GREEN);
+        REN_DrawString("HELLO WORLD", 0, 48, COL_BLUE);
+        REN_DrawString("HELLO WORLD", 0, 64, COL_CYAN);
+        REN_DrawString("HELLO WORLD", 0, 80, COL_MAGENTA);
+        REN_DrawString("HELLO WORLD", 0, 96, COL_YELLOW);
 
-        REN_Flip();
+        REN_Flip(true);
     }
 }
 

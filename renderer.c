@@ -14,7 +14,7 @@ extern unsigned long _sframebuf;
 #define GLYPH_WIDTH 10
 #define GLYPH_HEIGHT 16
 #define NUM_CHARS 36
-static const uint32_t FONT[GLYPH_WIDTH * GLYPH_HEIGHT * NUM_CHARS] = {
+static const uint8_t FONT[GLYPH_WIDTH * GLYPH_HEIGHT * NUM_CHARS] = {
 #include "font.inc"
 };
 
@@ -32,7 +32,6 @@ void REN_Init(viewport_t viewport)
     currentViewport.height = viewport.height;
 
     size_t pixelSize = sizeof(color_t);
-    //size_t pixelSize = sizeof(uint16_t);
 
     LAYER1->WHPCR = ((HSYNC + HBP + currentViewport.width - 1) << 16) | (HSYNC + HBP + currentViewport.x);
     LAYER1->WVPCR = ((VSYNC + VBP + currentViewport.height - 1) << 16) | (VSYNC + VBP + currentViewport.y);
@@ -40,7 +39,6 @@ void REN_Init(viewport_t viewport)
     LAYER1->CFBLNR = (currentViewport.height);
 
 	LAYER1->PFCR = LTDC_LxPFCR_PF_ARGB8888;
-    //LAYER1->PFCR = LTDC_LxPFCR_PF_RGB565;
 
     frontBuffer = (color_t *)(&_sframebuf);
     backBuffer = frontBuffer + (currentViewport.width * currentViewport.height);
@@ -54,8 +52,6 @@ void REN_Init(viewport_t viewport)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
 
     NVIC_EnableIRQ(LCD_IRQn);
-
-    //DMA2D->AMTCR = (0xFF << 8) | 1;
 }
 
 void REN_Clear(color_t color)
@@ -71,27 +67,10 @@ void REN_Clear(color_t color)
 
     DMA2D->CR = DMA2D_CR_MODE_REG2MEM | DMA2D_CR_START;
     while((DMA2D->CR & DMA2D_CR_START));
-
-    /*
-    uint16_t width = currentViewport.width;
-    uint16_t height = currentViewport.height;
-    for(int i = 0; i < width * height; ++i)
-        currentBuffer[i] = color;
-    */
 }
 
 void REN_PutPixel(int x, int y, color_t color)
 {
-    /*
-    uint32_t width = currentViewport.width;
-    uint32_t height = currentViewport.height;
-
-    if((x < 0 || x >= width) || (y < 0 || y >= height))
-        return;
-
-    uint32_t offset = ((y * width) + x);
-    currentBuffer[offset] = color;
-    */
     uint32_t width = currentViewport.width;
 
     DMA2D->OPFCCR = PFC_ARGB8888;
@@ -122,7 +101,7 @@ void REN_HorizontalLine(int x, int y, int length, color_t color)
 {
     uint32_t width = currentViewport.width;
 
-    DMA2D->OPFCCR = PFC_RGB565;
+    DMA2D->OPFCCR = PFC_ARGB8888;
     DMA2D->OCOLR = color;
     DMA2D->OMAR = (uint32_t)(currentBuffer + (x + y * width));
     DMA2D->NLR = (length << 16) | 1;
@@ -296,16 +275,25 @@ void REN_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t co
 
 static void BlitGlyph(int x, int y, int glyph, color_t color)
 {
-    for(int _y = 0; _y < GLYPH_HEIGHT; ++_y)
-    {
-        for(int _x = 0; _x < GLYPH_WIDTH; ++_x)
-        {
-            int index =  glyph + _x + _y * GLYPH_WIDTH;
-            uint32_t fontColor = FONT[index];
-            if(fontColor == 0xFF000000)
-                REN_PutPixel(x + _x, y + _y, color);
-        }
-    }
+    int width = currentViewport.width;
+
+    uint32_t framebufferAdress = (uint32_t)&currentBuffer[x + y * width];
+
+    DMA2D->FGCOLR = color;
+    DMA2D->FGMAR = (uint32_t)&FONT[glyph];
+    DMA2D->FGPFCCR = PFC_A8;
+
+    DMA2D->BGMAR = framebufferAdress;
+    DMA2D->BGOR = width - GLYPH_WIDTH;
+    DMA2D->BGPFCCR = PFC_ARGB8888;
+
+    DMA2D->NLR = (GLYPH_WIDTH << 16) | GLYPH_HEIGHT;
+    DMA2D->OOR = width - GLYPH_WIDTH;
+    DMA2D->OPFCCR = PFC_ARGB8888;
+    DMA2D->OMAR = framebufferAdress;
+
+    DMA2D->CR = DMA2D_CR_MODE_MEM2MEMBLEND | DMA2D_CR_START;
+    while((DMA2D->CR & DMA2D_CR_START));
 }
 
 void REN_DrawString(const char *string, int x, int y, color_t color)
@@ -336,12 +324,19 @@ void REN_DrawString(const char *string, int x, int y, color_t color)
 
 static volatile int vblank = 0;
 
-void REN_Flip()
+void REN_Flip(bool waitForVBlank)
 {
     LAYER1->CFBAR = (uint32_t)currentBuffer;
-    LTDC->SRCR = LTDC_SRCR_VBR;
-    while(!vblank);
-    vblank = 0;
+    if(waitForVBlank)
+    {
+        LTDC->SRCR = LTDC_SRCR_VBR;
+        while(!vblank);
+        vblank = 0;
+    }
+    else
+    {
+        LTDC->SRCR = LTDC_SRCR_IMR;
+    }
 
     if(currentBuffer == frontBuffer)
         currentBuffer = backBuffer;

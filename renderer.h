@@ -35,6 +35,6 @@ void REN_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t co
 
 void REN_DrawString(const char *string, int x, int y, color_t color);
 
-void REN_Flip();
+void REN_Flip(bool waitForVBlank);
 
 #endif
