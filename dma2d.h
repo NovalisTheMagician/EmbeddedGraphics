@@ -74,19 +74,4 @@ typedef struct
 #define DMA2D_XXPFCCR_CCM_ARGB      ((uint32_t)(0 << 4))
 #define DMA2D_XXPFCCR_CCM_RGB       ((uint32_t)(1 << 4))
 
-typedef enum
-{
-    PFC_ARGB8888,
-    PFC_RGB888,
-    PFC_RGB565,
-    PFC_ARGB1555,
-    PFC_ARGB4444,
-    PFC_L8,
-    PFC_AL44,
-    PFC_AL88,
-    PFC_L4,
-    PFC_A8,
-    PFC_A4
-} DMA2D_ColorFormat;
-
 #endif

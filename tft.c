@@ -6,8 +6,6 @@
 
 #include "delay.h"
 
-#define TRUE_COLOR
-
 #define DISP_PORT GPIOI
 #define DISP_PIN 12
 
@@ -38,8 +36,6 @@ void TFT_Init()
 	LTDC->BCCR = (255 << 16) | 255;
 
 	LTDC->IER = (1 << 3);
-
-    //LTDC->SRCR = LTDC_SRCR_IMR;
 
     LTDC->GCR |= LTDC_GCR_LTDCEN;
 }

@@ -66,13 +66,4 @@ typedef struct
 #define LTDC_LxCR_COLKEN    ((uint32_t)(1 << 1))
 #define LTDC_LxCR_LEN       ((uint32_t)(1 << 0))
 
-#define LTDC_LxPFCR_PF_ARGB8888     ((uint32_t)0)
-#define LTDC_LxPFCR_PF_RGB888       ((uint32_t)1)
-#define LTDC_LxPFCR_PF_RGB565       ((uint32_t)2)
-#define LTDC_LxPFCR_PF_ARGB1555     ((uint32_t)3)
-#define LTDC_LxPFCR_PF_ARGB4444     ((uint32_t)4)
-#define LTDC_LxPFCR_PF_L8           ((uint32_t)5)
-#define LTDC_LxPFCR_PF_AL44         ((uint32_t)6)
-#define LTDC_LxPFCR_PF_AL88         ((uint32_t)7)
-
 #endif
