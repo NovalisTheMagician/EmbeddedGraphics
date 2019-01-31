@@ -3,7 +3,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "rcc.h"
 #include "dma2d.h"
 #include "pixelformat.h"
 #include "nvic.h"
@@ -45,7 +44,7 @@ void REN_Init(viewport_t viewport)
 
     LAYER_Enable(LAYER1);
 
-    RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
+    DMA2D_Init();
 
     NVIC_EnableIRQ(LCD_IRQn);
 }
@@ -55,28 +54,28 @@ void REN_Clear(color_t color)
     uint16_t width = currentViewport.width;
     uint16_t height = currentViewport.height;
 
-    DMA2D->OPFCCR = PF_ARGB8888;
-    DMA2D->OCOLR = color;
-    DMA2D->OMAR = (uint32_t)currentBuffer;
-    DMA2D->NLR = (width << 16) | height;
-    DMA2D->OOR = 0;
+    DMA2D_ImageDef image = { 0 };
+    image.color = color;
+    image.pixelFormat = PF_ARGB8888;
+    image.memoryAddr = currentBuffer;
+    image.offset = 0;
 
-    DMA2D->CR = DMA2D_CR_MODE_REG2MEM | DMA2D_CR_START;
-    while((DMA2D->CR & DMA2D_CR_START));
+    DMA2D_SetOutput(&image, width, height);
+    DMA2D_StartTransfer(TT_RegToMem);
 }
 
 void REN_PutPixel(int x, int y, color_t color)
 {
     uint16_t width = currentViewport.width;
 
-    DMA2D->OPFCCR = PF_ARGB8888;
-    DMA2D->OCOLR = color;
-    DMA2D->OMAR = (uint32_t)&currentBuffer[x + y * width];
-    DMA2D->NLR = (1 << 16) | 1;
-    DMA2D->OOR = width - 1;
+    DMA2D_ImageDef image = { 0 };
+    image.color = color;
+    image.pixelFormat = PF_ARGB8888;
+    image.memoryAddr = &currentBuffer[x + y * width];
+    image.offset = width - 1;
 
-    DMA2D->CR = DMA2D_CR_MODE_REG2MEM | DMA2D_CR_START;
-    while((DMA2D->CR & DMA2D_CR_START));
+    DMA2D_SetOutput(&image, 1, 1);
+    DMA2D_StartTransfer(TT_RegToMem);
 }
 
 void REN_VerticalLine(int x, int y, int length, color_t color)
@@ -98,14 +97,14 @@ void REN_VerticalLine(int x, int y, int length, color_t color)
         length -= (y + length) - height;
     }
 
-    DMA2D->OPFCCR = PF_ARGB8888;
-    DMA2D->OCOLR = color;
-    DMA2D->OMAR = (uint32_t)&currentBuffer[x + y * width];
-    DMA2D->NLR = (1 << 16) | length;
-    DMA2D->OOR = width - 1;
+    DMA2D_ImageDef image = { 0 };
+    image.color = color;
+    image.pixelFormat = PF_ARGB8888;
+    image.memoryAddr = &currentBuffer[x + y * width];
+    image.offset = width - 1;
 
-    DMA2D->CR = DMA2D_CR_MODE_REG2MEM | DMA2D_CR_START;
-    while((DMA2D->CR & DMA2D_CR_START));
+    DMA2D_SetOutput(&image, 1, length);
+    DMA2D_StartTransfer(TT_RegToMem);
 }
 
 void REN_HorizontalLine(int x, int y, int length, color_t color)
@@ -127,14 +126,14 @@ void REN_HorizontalLine(int x, int y, int length, color_t color)
         length -= (x + length) - width;
     }
 
-    DMA2D->OPFCCR = PF_ARGB8888;
-    DMA2D->OCOLR = color;
-    DMA2D->OMAR = (uint32_t)&currentBuffer[x + y * width];
-    DMA2D->NLR = (length << 16) | 1;
-    DMA2D->OOR = width;
+    DMA2D_ImageDef image = { 0 };
+    image.color = color;
+    image.pixelFormat = PF_ARGB8888;
+    image.memoryAddr = &currentBuffer[x + y * width];
+    image.offset = width;
 
-    DMA2D->CR = DMA2D_CR_MODE_REG2MEM | DMA2D_CR_START;
-    while((DMA2D->CR & DMA2D_CR_START));
+    DMA2D_SetOutput(&image, length, 1);
+    DMA2D_StartTransfer(TT_RegToMem);
 }
 
 void REN_DrawLine(int x0, int y0, int x1, int y1, color_t color)
@@ -223,14 +222,14 @@ void REN_FillRect(int x, int y, int width, int height, color_t color)
         height -= (y + height) - screenHeight;
     }
 
-    DMA2D->OPFCCR = PF_ARGB8888;
-    DMA2D->OCOLR = color;
-    DMA2D->OMAR = (uint32_t)&currentBuffer[x + y * screenWidth];
-    DMA2D->NLR = (width << 16) | height;
-    DMA2D->OOR = screenWidth - width;
+    DMA2D_ImageDef image = { 0 };
+    image.color = color;
+    image.pixelFormat = PF_ARGB8888;
+    image.memoryAddr = &currentBuffer[x + y * screenWidth];
+    image.offset = screenWidth - width;
 
-    DMA2D->CR = DMA2D_CR_MODE_REG2MEM | DMA2D_CR_START;
-    while((DMA2D->CR & DMA2D_CR_START));
+    DMA2D_SetOutput(&image, width, height);
+    DMA2D_StartTransfer(TT_RegToMem);
 }
 
 void REN_DrawCircle(int x, int y, int radius, color_t color)
@@ -335,23 +334,27 @@ static void BlitGlyph(int x, int y, int glyph, color_t color)
 {
     uint16_t width = currentViewport.width;
 
-    uint32_t framebufferAdress = (uint32_t)&currentBuffer[x + y * width];
+    DMA2D_ImageDef foreground = { 0 };
+    foreground.color = color;
+    foreground.pixelFormat = PF_A8;
+    foreground.memoryAddr = &FONT[glyph];
 
-    DMA2D->FGCOLR = color;
-    DMA2D->FGMAR = (uint32_t)&FONT[glyph];
-    DMA2D->FGPFCCR = PF_A8;
+    color_t *framebufferAdress = &currentBuffer[x + y * width];
 
-    DMA2D->BGMAR = framebufferAdress;
-    DMA2D->BGOR = width - GLYPH_WIDTH;
-    DMA2D->BGPFCCR = PF_ARGB8888;
+    DMA2D_ImageDef background = { 0 };
+    background.pixelFormat = PF_ARGB8888;
+    background.memoryAddr = framebufferAdress;
+    background.offset = width - GLYPH_WIDTH;
 
-    DMA2D->NLR = (GLYPH_WIDTH << 16) | GLYPH_HEIGHT;
-    DMA2D->OOR = width - GLYPH_WIDTH;
-    DMA2D->OPFCCR = PF_ARGB8888;
-    DMA2D->OMAR = framebufferAdress;
+    DMA2D_ImageDef output = { 0 };
+    output.pixelFormat = PF_ARGB8888;
+    output.memoryAddr = framebufferAdress;
+    output.offset = width - GLYPH_WIDTH;
 
-    DMA2D->CR = DMA2D_CR_MODE_MEM2MEMBLEND | DMA2D_CR_START;
-    while((DMA2D->CR & DMA2D_CR_START));
+    DMA2D_SetForeground(&foreground);
+    DMA2D_SetBackground(&background);
+    DMA2D_SetOutput(&output, GLYPH_WIDTH, GLYPH_HEIGHT);
+    DMA2D_StartTransfer(TT_MemToMemBlend);
 }
 
 void REN_DrawString(const char *string, int x, int y, color_t color)

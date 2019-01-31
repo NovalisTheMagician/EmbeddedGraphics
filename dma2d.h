@@ -2,6 +2,7 @@
 #define DMA2D_H_
 
 #include "stm32f7.h"
+#include "pixelformat.h"
 
 typedef struct
 {
@@ -73,5 +74,27 @@ typedef struct
 
 #define DMA2D_XXPFCCR_CCM_ARGB      ((uint32_t)(0 << 4))
 #define DMA2D_XXPFCCR_CCM_RGB       ((uint32_t)(1 << 4))
+
+typedef struct 
+{
+    void const *memoryAddr;
+    uint32_t offset;
+    PF_PixelFormat pixelFormat;
+    uint32_t color;
+} DMA2D_ImageDef;
+
+typedef enum
+{
+    TT_RegToMem = DMA2D_CR_MODE_REG2MEM,
+    TT_MemToMem = DMA2D_CR_MODE_MEM2MEM,
+    TT_MemToMemPixelConv = DMA2D_CR_MODE_MEM2MEMPFC,
+    TT_MemToMemBlend = DMA2D_CR_MODE_MEM2MEMBLEND
+} DMA2D_TransferType;
+
+void DMA2D_Init();
+void DMA2D_SetForeground(DMA2D_ImageDef *imageDef);
+void DMA2D_SetBackground(DMA2D_ImageDef *imageDef);
+void DMA2D_SetOutput(DMA2D_ImageDef *imageDef, uint16_t width, uint16_t height);
+void DMA2D_StartTransfer(DMA2D_TransferType transferType);
 
 #endif
