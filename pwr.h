@@ -9,10 +9,10 @@ typedef struct
     volatile uint32_t CSR1;
     volatile uint32_t CR2;
     volatile uint32_t CSR2;
-} PWR_TypeDef;
+} PWR_t;
 
 #define PWR_BASE (APB1PERIPH_BASE + 0x7000)
-#define PWR ((PWR_TypeDef *) PWR_BASE)
+#define PWR ((PWR_t *) PWR_BASE)
 
 #define PWR_CR_UDEN     ((uint32_t)(3 << 18))
 #define PWR_CR_ODSWEN   ((uint32_t)(1 << 17))

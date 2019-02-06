@@ -8,10 +8,10 @@ typedef struct
     volatile uint32_t CR;
     volatile uint32_t SR;
     volatile uint32_t DR;
-} RNG_TypeDef;
+} RNG_t;
 
 #define RNG_BASE (AHB2PERIPH_BASE + 0x00060800)
-#define RNG ((RNG_TypeDef *) RNG_BASE)
+#define RNG ((RNG_t *) RNG_BASE)
 
 #define RNG_CR_CED      ((uint32_t)(1 << 5))
 #define RNG_CR_IE       ((uint23_t)(1 << 3))

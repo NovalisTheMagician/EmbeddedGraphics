@@ -132,7 +132,7 @@ typedef struct
     int dx;
     int dy;
     uint32_t color;
-} Block;
+} block_t;
 
 #define NUM_BLOCKS 1000
 
@@ -140,7 +140,7 @@ void fun()
 {
     RNG_Init();
 
-    Block blocks[NUM_BLOCKS];
+    block_t blocks[NUM_BLOCKS];
     for(int i = 0; i < NUM_BLOCKS; ++i)
     {
         blocks[i].x = RNG_GetRandom() % (WIDTH - 16);

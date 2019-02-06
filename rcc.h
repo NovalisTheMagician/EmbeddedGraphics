@@ -38,10 +38,10 @@ typedef struct
     volatile uint32_t PLLSAICFGR;
     volatile uint32_t DCKCFGR1;
     volatile uint32_t DCKCFGR2;
-} RCC_TypeDef;
+} RCC_t;
 
 #define RCC_BASE    (AHB1PERIPH_BASE + 0x3800)
-#define RCC         ((RCC_TypeDef *) RCC_BASE)
+#define RCC         ((RCC_t *) RCC_BASE)
 
 /***  RCC_AHB1ENR register  ***/
 #define RCC_AHB1ENR_GPIOAEN ((uint32_t)0x00000001)

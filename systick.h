@@ -9,10 +9,10 @@ typedef struct
     volatile uint32_t LOAD;
     volatile uint32_t VAL;
     volatile uint32_t CALIB;
-} SYSTICK_TypeDef;
+} SYSTICK_t;
 
 #define SYSTICK_BASE ((uint32_t) 0xE000E010)
-#define SYSTICK ((SYSTICK_TypeDef *) SYSTICK_BASE)
+#define SYSTICK ((SYSTICK_t *) SYSTICK_BASE)
 
 #define SYSTICK_CTRL_CLKSRC_AHB8    ((uint32_t)(0 << 2))
 #define SYSTICK_CTRL_CLKSRC_AHB     ((uint32_t)(1 << 2))

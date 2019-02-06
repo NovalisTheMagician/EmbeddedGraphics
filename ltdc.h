@@ -22,7 +22,7 @@ typedef struct
     volatile uint32_t LIPCR;
     volatile uint32_t CPSR;
     volatile uint32_t CDSR;
-} LTDC_TypeDef;
+} LTDC_t;
 
 typedef struct
 {
@@ -40,13 +40,13 @@ typedef struct
     volatile uint32_t CFBLNR;
     uint32_t RESERVED1[4];
     volatile uint32_t CLUTWR;
-} LAYER_TypeDef;
+} LAYER_t;
 
 #define LTDC_BASE (APB2PERIPH_BASE + 0x6800)
 
-#define LTDC ((LTDC_TypeDef *) LTDC_BASE)
-#define LAYER1 ((LAYER_TypeDef *) (LTDC_BASE + 0x0084))
-#define LAYER2 ((LAYER_TypeDef *) (LTDC_BASE + 0x0104))
+#define LTDC ((LTDC_t *) LTDC_BASE)
+#define LAYER1 ((LAYER_t *) (LTDC_BASE + 0x0084))
+#define LAYER2 ((LAYER_t *) (LTDC_BASE + 0x0104))
 
 #define LTDC_GCR_HSPOL_AH   ((uint32_t)(1 << 31))
 #define LTDC_GCR_HSPOL_AL   ((uint32_t)(0 << 31))

@@ -23,10 +23,10 @@ typedef struct
     volatile uint32_t ADR;
     volatile uint32_t MMFR[4];
     volatile uint32_t ISAR[5];
-} SCB_Typedef;
+} SCB_t;
 
 #define SCB_BASE ((uint32_t) 0xE000ED00)
-#define SCB ((SCB_Typedef *) SCB_BASE)
+#define SCB ((SCB_t *) SCB_BASE)
 
 #define SCB_AIRCR_VECTKEY       ((uint32_t)(0x5FA << 16))
 #define SCB_AIRCR_SYSRESETRQ    ((uint32_t)(1 << 2))

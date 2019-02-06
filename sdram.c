@@ -11,43 +11,11 @@
 #define TRP(x)  (x << 20)
 #define TRCD(x) (x << 24)
 
-static  GPIO_TypeDef * const GPIOInitTable[] = {
-		// address ports
-		GPIOF, GPIOF, GPIOF, GPIOF, GPIOF, GPIOF, GPIOF, GPIOF, GPIOF, GPIOF, GPIOG, GPIOG,
-		// data ports
-		GPIOD, GPIOD, GPIOD, GPIOD, GPIOE, GPIOE, GPIOE, GPIOE, GPIOE, GPIOE, GPIOE, GPIOE, GPIOE,
-		GPIOD, GPIOD, GPIOD,
-		// control ports
-		GPIOC, GPIOH, GPIOH, GPIOE, GPIOE, GPIOF, GPIOG, GPIOG, GPIOG, GPIOG,
-		0
-};
-
-static uint8_t const PINInitTable[] = {
-		// address pins
-		0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 0, 1,
-		// data pins
-		14, 15, 0, 1, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-		8, 9, 10,
-		// control pins
-		3, 3, 5, 0, 1, 11, 4, 5, 8, 15,
-		0
-};
-
-void InitGPIO()
-{
-
-}
+static void SetupGPIO();
 
 void SDRAM_Init()
 {
-	volatile uint32_t ptr = 0;
-	volatile uint32_t i = 0;
-
-	while(GPIOInitTable[i] != 0) 
-	{
-		GPIO_AFConf(GPIOInitTable[i], PINInitTable[i], 12);
-		i++;
-	}
+	SetupGPIO();
 	
 	RCC->AHB3ENR |= RCC_AHB3ENR_FMCEN;
 	// Initialization step 1
@@ -58,7 +26,7 @@ void SDRAM_Init()
 	while(SDRAM->SDSR & FMC_SDSR_BUSY);
 	SDRAM->SDCMR = FMC_SDCMR_MODE_CCE | FMC_SDCMR_CTB1 | (1 << 5);
 	// Initialization step 4
-	for(i = 0; i  < 1000000; i++);
+	for(int i = 0; i  < 1000000; i++);
 	// Initialization step 5
 	while(SDRAM->SDSR & FMC_SDSR_BUSY);
 	SDRAM->SDCMR = FMC_SDCMR_MODE_PALL | FMC_SDCMR_CTB1 | (1 << 5);
@@ -75,8 +43,51 @@ void SDRAM_Init()
 
 	uint32_t temp = SDRAM->SDCR[0];
 	SDRAM->SDCR[0] = (temp & ~FMC_SDCR_WP);
+}
 
-	// Clear SDRAM
-	for(ptr = SDRAM_BASE_ADDR; ptr < (SDRAM_BASE_ADDR + SDRAM_SIZE); ptr += 4)
-			*((uint32_t *)ptr) = 0xFF000000;
+static void SetupGPIO()
+{
+	//address pins
+	GPIO_AFConf(GPIOF, 0, 12);
+	GPIO_AFConf(GPIOF, 1, 12);
+	GPIO_AFConf(GPIOF, 2, 12);
+	GPIO_AFConf(GPIOF, 3, 12);
+	GPIO_AFConf(GPIOF, 4, 12);
+	GPIO_AFConf(GPIOF, 5, 12);
+	GPIO_AFConf(GPIOF, 12, 12);
+	GPIO_AFConf(GPIOF, 13, 12);
+	GPIO_AFConf(GPIOF, 14, 12);
+	GPIO_AFConf(GPIOF, 15, 12);
+	GPIO_AFConf(GPIOG, 0, 12);
+	GPIO_AFConf(GPIOG, 1, 12);
+
+	//data pins
+	GPIO_AFConf(GPIOD, 14, 12);
+	GPIO_AFConf(GPIOD, 15, 12);
+	GPIO_AFConf(GPIOD, 0, 12);
+	GPIO_AFConf(GPIOD, 1, 12);
+	GPIO_AFConf(GPIOE, 7, 12);
+	GPIO_AFConf(GPIOE, 8, 12);
+	GPIO_AFConf(GPIOE, 9, 12);
+	GPIO_AFConf(GPIOE, 10, 12);
+	GPIO_AFConf(GPIOE, 11, 12);
+	GPIO_AFConf(GPIOE, 12, 12);
+	GPIO_AFConf(GPIOE, 13, 12);
+	GPIO_AFConf(GPIOE, 14, 12);
+	GPIO_AFConf(GPIOE, 15, 12);
+	GPIO_AFConf(GPIOD, 8, 12);
+	GPIO_AFConf(GPIOD, 9, 12);
+	GPIO_AFConf(GPIOD, 10, 12);
+	
+	//control pins
+	GPIO_AFConf(GPIOC, 3, 12);
+	GPIO_AFConf(GPIOH, 3, 12);
+	GPIO_AFConf(GPIOH, 5, 12);
+	GPIO_AFConf(GPIOE, 0, 12);
+	GPIO_AFConf(GPIOE, 1, 12);
+	GPIO_AFConf(GPIOF, 11, 12);
+	GPIO_AFConf(GPIOG, 4, 12);
+	GPIO_AFConf(GPIOG, 5, 12);
+	GPIO_AFConf(GPIOG, 8, 12);
+	GPIO_AFConf(GPIOG, 15, 12);
 }

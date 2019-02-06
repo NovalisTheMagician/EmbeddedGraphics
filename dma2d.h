@@ -26,10 +26,10 @@ typedef struct
     volatile uint32_t NLR;
     volatile uint32_t LWR;
     volatile uint32_t AMTCR;
-} DMA2D_TypeDef;
+} DMA2D_t;
 
 #define DMA2D_BASE (AHB1PERIPH_BASE + 0xB000)
-#define DMA2D ((DMA2D_TypeDef *) DMA2D_BASE)
+#define DMA2D ((DMA2D_t *) DMA2D_BASE)
 
 #define DMA2D_FGCLUT_ADDRESS (DMA2D_BASE + 0x0400)
 #define DMA2D_BGCLUT_ADDRESS (DMA2D_BASE + 0x0800)
@@ -81,7 +81,7 @@ typedef struct
     uint32_t offset;
     PF_PixelFormat pixelFormat;
     uint32_t color;
-} DMA2D_ImageDef;
+} DMA2D_Image_t;
 
 typedef enum
 {
@@ -92,9 +92,9 @@ typedef enum
 } DMA2D_TransferType;
 
 void DMA2D_Init();
-void DMA2D_SetForeground(DMA2D_ImageDef *imageDef);
-void DMA2D_SetBackground(DMA2D_ImageDef *imageDef);
-void DMA2D_SetOutput(DMA2D_ImageDef *imageDef, uint16_t width, uint16_t height);
+void DMA2D_SetForeground(DMA2D_Image_t *imageDef);
+void DMA2D_SetBackground(DMA2D_Image_t *imageDef);
+void DMA2D_SetOutput(DMA2D_Image_t *imageDef, uint16_t width, uint16_t height);
 void DMA2D_StartTransfer(DMA2D_TransferType transferType);
 
 #endif

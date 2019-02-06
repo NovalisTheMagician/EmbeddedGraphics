@@ -1,20 +1,20 @@
 #include "gpio.h"
 
-static void GPIO_SetAFHigh(GPIO_TypeDef *port, uint8_t pin, uint8_t af)
+static void GPIO_SetAFHigh(GPIO_t *port, uint8_t pin, uint8_t af)
 {
     uint32_t shift = pin * 4;
     uint32_t mask = (15 << shift);
     port->AFR[1] = (port->AFR[1] & ~mask) | (af << shift);
 }
 
-static void GPIO_SetAFLow(GPIO_TypeDef *port, uint8_t pin, uint8_t af)
+static void GPIO_SetAFLow(GPIO_t *port, uint8_t pin, uint8_t af)
 {
     uint32_t shift = pin * 4;
     uint32_t mask = (15 << shift);
     port->AFR[0] = (port->AFR[0] & ~mask) | (af << shift);
 }
 
-void GPIO_Conf(GPIO_TypeDef *port, uint8_t pin, GPIO_Mode mode, GPIO_OutputType otype, GPIO_OSpeed ospeed, GPIO_PullUpDown pullup)
+void GPIO_Conf(GPIO_t *port, uint8_t pin, GPIO_Mode mode, GPIO_OutputType otype, GPIO_OSpeed ospeed, GPIO_PullUpDown pullup)
 {
     //check if the pin is in range [0, 15]
     if(pin > 15) return;
@@ -31,7 +31,7 @@ void GPIO_Conf(GPIO_TypeDef *port, uint8_t pin, GPIO_Mode mode, GPIO_OutputType 
     port->PUPDR = (port->PUPDR & ~mask2) | (pullup << shift2);
 }
 
-void GPIO_AFConf(GPIO_TypeDef *port, uint8_t pin, uint8_t mode)
+void GPIO_AFConf(GPIO_t *port, uint8_t pin, uint8_t mode)
 {
     if(pin > 15) return;
 
@@ -56,13 +56,13 @@ void GPIO_AFConf(GPIO_TypeDef *port, uint8_t pin, uint8_t mode)
     port->PUPDR = (port->PUPDR & ~mask2) | (GPIO_PUD_NONE << shift2);
 }
 
-uint8_t GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin)
+uint8_t GPIO_ReadPin(GPIO_t *port, uint8_t pin)
 {
     uint32_t mask = (1 << pin);
     return port->IDR & mask;
 }
 
-void GPIO_WritePin(GPIO_TypeDef *port, uint8_t pin, uint8_t val)
+void GPIO_WritePin(GPIO_t *port, uint8_t pin, uint8_t val)
 {
     uint16_t mask = (1 << pin);
     if(val)

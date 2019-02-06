@@ -2,7 +2,7 @@
 #include "rcc.h"
 #include "gpio.h"
 
-void SPI_Conf(SPI_TypeDef *spi)
+void SPI_Conf(SPI_t *spi)
 {
     if(spi == SPI5)
     {
@@ -18,7 +18,7 @@ void SPI_Conf(SPI_TypeDef *spi)
     }
 }
 
-uint16_t SPI_Transmit(SPI_TypeDef *spi, uint16_t val)
+uint16_t SPI_Transmit(SPI_t *spi, uint16_t val)
 {
     spi->DR = val;
     while((spi->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0);

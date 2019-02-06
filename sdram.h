@@ -11,12 +11,12 @@ typedef struct
   volatile uint32_t SDCMR;
   volatile uint32_t SDRTR;
   volatile uint32_t SDSR;
-} SDRAM_TypeDef;
+} SDRAM_t;
 
 #define FMC_BASE ((uint32_t)0xA0000000)
 #define SDRAM_BASE (FMC_BASE + 0x0140)
 
-#define SDRAM ((SDRAM_TypeDef *) SDRAM_BASE)
+#define SDRAM ((SDRAM_t *) SDRAM_BASE)
 
 #define FMC_SDCR_RPIPE_1  ((uint32_t)0x2000)
 #define FMC_SDCR_RPIPE_2  ((uint32_t)0x4000)

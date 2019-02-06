@@ -15,7 +15,7 @@ typedef struct
   volatile uint16_t BSRRH;
   volatile uint32_t LCKR;
   volatile uint32_t AFR[2];
-} GPIO_TypeDef;
+} GPIO_t;
 
 #define GPIOA_BASE (AHB1PERIPH_BASE + 0x0000)
 #define GPIOB_BASE (AHB1PERIPH_BASE + 0x0400)
@@ -29,17 +29,17 @@ typedef struct
 #define GPIOJ_BASE (AHB1PERIPH_BASE + 0x2400)
 #define GPIOK_BASE (AHB1PERIPH_BASE + 0x2800)
 
-#define GPIOA ((GPIO_TypeDef *) GPIOA_BASE)
-#define GPIOB ((GPIO_TypeDef *) GPIOB_BASE)
-#define GPIOC ((GPIO_TypeDef *) GPIOC_BASE)
-#define GPIOD ((GPIO_TypeDef *) GPIOD_BASE)
-#define GPIOE ((GPIO_TypeDef *) GPIOE_BASE)
-#define GPIOF ((GPIO_TypeDef *) GPIOF_BASE)
-#define GPIOG ((GPIO_TypeDef *) GPIOG_BASE)
-#define GPIOH ((GPIO_TypeDef *) GPIOH_BASE)
-#define GPIOI ((GPIO_TypeDef *) GPIOI_BASE)
-#define GPIOJ ((GPIO_TypeDef *) GPIOJ_BASE)
-#define GPIOK ((GPIO_TypeDef *) GPIOK_BASE)
+#define GPIOA ((GPIO_t *) GPIOA_BASE)
+#define GPIOB ((GPIO_t *) GPIOB_BASE)
+#define GPIOC ((GPIO_t *) GPIOC_BASE)
+#define GPIOD ((GPIO_t *) GPIOD_BASE)
+#define GPIOE ((GPIO_t *) GPIOE_BASE)
+#define GPIOF ((GPIO_t *) GPIOF_BASE)
+#define GPIOG ((GPIO_t *) GPIOG_BASE)
+#define GPIOH ((GPIO_t *) GPIOH_BASE)
+#define GPIOI ((GPIO_t *) GPIOI_BASE)
+#define GPIOJ ((GPIO_t *) GPIOJ_BASE)
+#define GPIOK ((GPIO_t *) GPIOK_BASE)
 
 typedef enum
 {
@@ -70,11 +70,11 @@ typedef enum
   GPIO_OSPEED_VERYHIGHSPEED
 } GPIO_OSpeed;
 
-void GPIO_Conf(GPIO_TypeDef *port, uint8_t pin, GPIO_Mode mode, GPIO_OutputType otype, GPIO_OSpeed ospeed, GPIO_PullUpDown pullup);
+void GPIO_Conf(GPIO_t *port, uint8_t pin, GPIO_Mode mode, GPIO_OutputType otype, GPIO_OSpeed ospeed, GPIO_PullUpDown pullup);
 
-void GPIO_AFConf(GPIO_TypeDef *port, uint8_t pin, uint8_t mode);
+void GPIO_AFConf(GPIO_t *port, uint8_t pin, uint8_t mode);
 
-uint8_t GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin);
-void GPIO_WritePin(GPIO_TypeDef *port, uint8_t pin, uint8_t val);
+uint8_t GPIO_ReadPin(GPIO_t *port, uint8_t pin);
+void GPIO_WritePin(GPIO_t *port, uint8_t pin, uint8_t val);
 
 #endif

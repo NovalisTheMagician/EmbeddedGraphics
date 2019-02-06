@@ -23,7 +23,7 @@ typedef struct
     uint16_t RESERVED7;
     volatile uint16_t I2SPR;
     uint16_t RESERVED8;
-} SPI_TypeDef;
+} SPI_t;
 
 #define SPI1_BASE (APB2PERIPH_BASE + 0x3000)
 #define SPI2_BASE (APB1PERIPH_BASE + 0x3800)
@@ -32,12 +32,12 @@ typedef struct
 #define SPI5_BASE (APB2PERIPH_BASE + 0x5000)
 #define SPI6_BASE (APB2PERIPH_BASE + 0x5400)
 
-#define SPI1 ((SPI_TypeDef *) SPI1_BASE)
-#define SPI2 ((SPI_TypeDef *) SPI2_BASE)
-#define SPI3 ((SPI_TypeDef *) SPI3_BASE)
-#define SPI4 ((SPI_TypeDef *) SPI4_BASE)
-#define SPI5 ((SPI_TypeDef *) SPI5_BASE)
-#define SPI6 ((SPI_TypeDef *) SPI6_BASE)
+#define SPI1 ((SPI_t *) SPI1_BASE)
+#define SPI2 ((SPI_t *) SPI2_BASE)
+#define SPI3 ((SPI_t *) SPI3_BASE)
+#define SPI4 ((SPI_t *) SPI4_BASE)
+#define SPI5 ((SPI_t *) SPI5_BASE)
+#define SPI6 ((SPI_t *) SPI6_BASE)
 
 #define SPI_CR1_BIDIMODE    ((uint16_t)(1 << 15))
 #define SPI_CR1_BIDIOE      ((uint16_t)(1 << 14))
@@ -86,7 +86,7 @@ typedef struct
 #define SPI_SR_TXE          ((uint16_t)(1 << 1))
 #define SPI_SR_RXNE         ((uint16_t)(1 << 0))
 
-void SPI_Conf(SPI_TypeDef *spi);
-uint16_t SPI_Transmit(SPI_TypeDef *spi, uint16_t val);
+void SPI_Conf(SPI_t *spi);
+uint16_t SPI_Transmit(SPI_t *spi, uint16_t val);
 
 #endif

@@ -12,9 +12,9 @@ typedef struct
     volatile uint32_t CR;
     volatile uint32_t OPTCR;
     volatile uint32_t OPTCR1;
-} FLASH_TypeDef;
+} FLASH_t;
 
 #define FLASH_BASE (AHB1PERIPH_BASE + 0x3C00)
-#define FLASH ((FLASH_TypeDef *) FLASH_BASE)
+#define FLASH ((FLASH_t *) FLASH_BASE)
 
 #endif

@@ -18,10 +18,10 @@ typedef struct
     volatile uint32_t IPR[240];
     uint32_t RESERVED5[644];
     volatile uint32_t STIR;
-} NVIC_TypeDef;
+} NVIC_t;
 
 #define NVIC_BASE ((uint32_t) 0xE000E100)
-#define NVIC ((NVIC_TypeDef *) NVIC_BASE)
+#define NVIC ((NVIC_t *) NVIC_BASE)
 
 typedef enum
 {

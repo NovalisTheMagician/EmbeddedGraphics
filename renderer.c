@@ -54,7 +54,7 @@ void REN_Clear(color_t color)
     uint16_t width = currentViewport.width;
     uint16_t height = currentViewport.height;
 
-    DMA2D_ImageDef image = { 0 };
+    DMA2D_Image_t image = { 0 };
     image.color = color;
     image.pixelFormat = PF_ARGB8888;
     image.memoryAddr = currentBuffer;
@@ -90,7 +90,7 @@ void REN_VerticalLine(int x, int y, int length, color_t color)
         length -= (y + length) - height;
     }
 
-    DMA2D_ImageDef image = { 0 };
+    DMA2D_Image_t image = { 0 };
     image.color = color;
     image.pixelFormat = PF_ARGB8888;
     image.memoryAddr = &currentBuffer[x + y * width];
@@ -119,7 +119,7 @@ void REN_HorizontalLine(int x, int y, int length, color_t color)
         length -= (x + length) - width;
     }
 
-    DMA2D_ImageDef image = { 0 };
+    DMA2D_Image_t image = { 0 };
     image.color = color;
     image.pixelFormat = PF_ARGB8888;
     image.memoryAddr = &currentBuffer[x + y * width];
@@ -217,7 +217,7 @@ void REN_FillRect(int x, int y, int width, int height, color_t color)
         height -= (y + height) - screenHeight;
     }
 
-    DMA2D_ImageDef image = { 0 };
+    DMA2D_Image_t image = { 0 };
     image.color = color;
     image.pixelFormat = PF_ARGB8888;
     image.memoryAddr = &currentBuffer[x + y * screenWidth];
@@ -329,19 +329,19 @@ static void BlitGlyph(int x, int y, int glyph, color_t color)
 {
     uint16_t width = currentViewport.width;
 
-    DMA2D_ImageDef foreground = { 0 };
+    DMA2D_Image_t foreground = { 0 };
     foreground.color = color;
     foreground.pixelFormat = PF_A8;
     foreground.memoryAddr = &FONT[glyph];
 
     color_t *framebufferAdress = &currentBuffer[x + y * width];
 
-    DMA2D_ImageDef background = { 0 };
+    DMA2D_Image_t background = { 0 };
     background.pixelFormat = PF_ARGB8888;
     background.memoryAddr = framebufferAdress;
     background.offset = width - GLYPH_WIDTH;
 
-    DMA2D_ImageDef output = { 0 };
+    DMA2D_Image_t output = { 0 };
     output.pixelFormat = PF_ARGB8888;
     output.memoryAddr = framebufferAdress;
     output.offset = width - GLYPH_WIDTH;
