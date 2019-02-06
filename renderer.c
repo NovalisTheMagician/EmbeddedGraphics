@@ -68,14 +68,7 @@ void REN_PutPixel(int x, int y, color_t color)
 {
     uint16_t width = currentViewport.width;
 
-    DMA2D_ImageDef image = { 0 };
-    image.color = color;
-    image.pixelFormat = PF_ARGB8888;
-    image.memoryAddr = &currentBuffer[x + y * width];
-    image.offset = width - 1;
-
-    DMA2D_SetOutput(&image, 1, 1);
-    DMA2D_StartTransfer(TT_RegToMem);
+    currentBuffer[x + y * width] = color;
 }
 
 void REN_VerticalLine(int x, int y, int length, color_t color)
@@ -138,7 +131,9 @@ void REN_HorizontalLine(int x, int y, int length, color_t color)
 
 void REN_DrawLine(int x0, int y0, int x1, int y1, color_t color)
 {
-    
+    if(x0 < 0) x0 = 0;
+    if(y0 < 0) y0 = 0;
+
     if((x0 - x1) == 0)
     {
         if(y0 < y1)

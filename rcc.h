@@ -58,6 +58,8 @@ typedef struct
 
 #define RCC_AHB1ENR_DMA2DEN ((uint32_t)(1 << 23))
 
+#define RCC_AHB2ENR_RNGEN   ((uint32_t)(1 << 6))
+
 #define RCC_APB2ENR_SPI1EN  ((uint32_t)(1 << 12))
 #define RCC_APB1ENR_SPI2EN  ((uint32_t)(1 << 14))
 #define RCC_APB1ENR_SPI3EN  ((uint32_t)(1 << 15))

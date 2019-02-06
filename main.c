@@ -13,6 +13,8 @@
 
 #include <stdio.h>
 
+#include "rng.h"
+
 #define LED1 1
 
 #define WIDTH 480
@@ -23,6 +25,8 @@ void led_off(uint32_t led);
 
 void blink(int amount, uint32_t led);
 void blink_fast(int amount, uint32_t led);
+
+void fun();
 
 int main()
 {
@@ -46,6 +50,8 @@ int main()
     int fps = 0;
 
     int fpsVal = 0;
+
+    fun();
 
     while(1)
     {
@@ -93,10 +99,10 @@ int main()
         REN_DrawLine(100, 100, 150, 200, COL_BLUE);
 
         //REN_FillTriangle(200, 200, 300, 270, 150, 250, COL_RED);
-        //REN_DrawTriangle(200, 200, 300, 270, 150, 250, COL_MAGENTA);
+        REN_DrawTriangle(200, 200, 300, 270, 150, 250, COL_MAGENTA);
 
-        //REN_FillCircle(WIDTH / 2, HEIGHT / 2, 40, COL_BLUE);
-        //REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 40, COL_CYAN);
+        REN_FillCircle(WIDTH / 2, HEIGHT / 2, 40, COL_BLUE);
+        REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 40, COL_CYAN);
 
         /*
         for(int ny = 0; ny < HEIGHT; ++ny)
@@ -114,6 +120,63 @@ int main()
         char buffer[8];
         sprintf(buffer, "FPS %d", fpsVal);
         REN_DrawString(buffer, 1, 1, COL_YELLOW);
+
+        REN_Flip(true);
+    }
+}
+
+typedef struct
+{
+    int x;
+    int y;
+    int dx;
+    int dy;
+    uint32_t color;
+} Block;
+
+#define NUM_BLOCKS 1000
+
+void fun()
+{
+    RNG_Init();
+
+    Block blocks[NUM_BLOCKS];
+    for(int i = 0; i < NUM_BLOCKS; ++i)
+    {
+        blocks[i].x = RNG_GetRandom() % (WIDTH - 16);
+        blocks[i].y = RNG_GetRandom() % (HEIGHT - 16);
+        blocks[i].dx = (RNG_GetRandom() % 5) + 1;
+        blocks[i].dy = (RNG_GetRandom() % 5) + 1;
+        blocks[i].color = RNG_GetRandom() | (0xFF << 24);
+    }
+
+    while(1)
+    {
+        REN_Clear(COL_BLACK);
+
+        for(int i = 0; i < NUM_BLOCKS; ++i)
+        {
+            int x = blocks[i].x;
+            int y = blocks[i].y;
+
+            int dx = blocks[i].dx;
+            int dy = blocks[i].dy;
+
+            x += dx;
+            y += dy;
+
+            if(((x + 16) >= WIDTH) || (x < 0))
+                dx = -dx;
+            if(((y + 16) >= HEIGHT) || (y < 0))
+                dy = -dy;
+
+            blocks[i].x = x;
+            blocks[i].y = y;
+            blocks[i].dx = dx;
+            blocks[i].dy = dy;
+
+            REN_FillRect(x, y, 16, 16, blocks[i].color);
+        }
 
         REN_Flip(true);
     }
