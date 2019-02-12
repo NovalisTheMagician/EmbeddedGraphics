@@ -4,15 +4,10 @@
 #include "tft.h"
 #include "systick.h"
 #include "delay.h"
-
 #include "colors32.h"
-
 #include <math.h>
-
 #include "renderer.h"
-
 #include <stdio.h>
-
 #include "rng.h"
 
 #define LED1 1
@@ -20,13 +15,7 @@
 #define WIDTH 480
 #define HEIGHT 272
 
-void led_on(uint32_t led);
-void led_off(uint32_t led);
-
-void blink(int amount, uint32_t led);
-void blink_fast(int amount, uint32_t led);
-
-void fun();
+void Fun();
 
 int main()
 {
@@ -51,7 +40,7 @@ int main()
 
     int fpsVal = 0;
 
-    fun();
+    Fun();
 
     while(1)
     {
@@ -136,7 +125,7 @@ typedef struct
 
 #define NUM_BLOCKS 1000
 
-void fun()
+void Fun()
 {
     RNG_Init();
 
@@ -182,24 +171,9 @@ void fun()
     }
 }
 
-int n = 1000;
-void blink(int amount, uint32_t led)
-{
-    for(int i = 0; i < amount; ++i)
-    {
-        led_on(led);
-        delay(n);
-        led_off(led);
-        delay(n);
-    }
-}
-
+/*
 void led_on(uint32_t led)
 {
     GPIO_WritePin(GPIOI, led, 1);
 }
-
-void led_off(uint32_t led)
-{
-    GPIO_WritePin(GPIOI, led, 0);
-}
+*/

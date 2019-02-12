@@ -193,17 +193,17 @@ void Startup()
     main();
 }
 
-char *__brkval = (char*)(&_ssdram);
+char *__brkval = (char *)(&_ssdram);
 
-void* _sbrk(int incr)
+void *_sbrk(int incr)
 {
     char *prev = __brkval;
     if(incr != 0)
     {
-        if(prev + incr >= (char*)&_esdram)
+        if(prev + incr >= (char *)&_esdram)
         {
             errno = ENOMEM;
-            return (void*)-1;
+            return (void *)-1;
         }
         __brkval = prev + incr;
     }

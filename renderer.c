@@ -61,7 +61,7 @@ void REN_Clear(color_t color)
     image.offset = 0;
 
     DMA2D_SetOutput(&image, width, height);
-    DMA2D_StartTransfer(TT_RegToMem);
+    DMA2D_StartTransfer(TT_REGTOMEM);
 }
 
 void REN_PutPixel(int x, int y, color_t color)
@@ -97,7 +97,7 @@ void REN_VerticalLine(int x, int y, int length, color_t color)
     image.offset = width - 1;
 
     DMA2D_SetOutput(&image, 1, length);
-    DMA2D_StartTransfer(TT_RegToMem);
+    DMA2D_StartTransfer(TT_REGTOMEM);
 }
 
 void REN_HorizontalLine(int x, int y, int length, color_t color)
@@ -126,7 +126,7 @@ void REN_HorizontalLine(int x, int y, int length, color_t color)
     image.offset = width;
 
     DMA2D_SetOutput(&image, length, 1);
-    DMA2D_StartTransfer(TT_RegToMem);
+    DMA2D_StartTransfer(TT_REGTOMEM);
 }
 
 void REN_DrawLine(int x0, int y0, int x1, int y1, color_t color)
@@ -224,7 +224,7 @@ void REN_FillRect(int x, int y, int width, int height, color_t color)
     image.offset = screenWidth - width;
 
     DMA2D_SetOutput(&image, width, height);
-    DMA2D_StartTransfer(TT_RegToMem);
+    DMA2D_StartTransfer(TT_REGTOMEM);
 }
 
 void REN_DrawCircle(int x, int y, int radius, color_t color)
@@ -349,7 +349,7 @@ static void BlitGlyph(int x, int y, int glyph, color_t color)
     DMA2D_SetForeground(&foreground);
     DMA2D_SetBackground(&background);
     DMA2D_SetOutput(&output, GLYPH_WIDTH, GLYPH_HEIGHT);
-    DMA2D_StartTransfer(TT_MemToMemBlend);
+    DMA2D_StartTransfer(TT_MEMTOMEMBLEND);
 }
 
 void REN_DrawString(const char *string, int x, int y, color_t color)

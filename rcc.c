@@ -8,7 +8,7 @@ void RCC_InitClocks()
 
     PWR->CR1 |= PWR_CR_VOS_SCALE1;
 
-    RCC->CR |= RCC_CR_HSEON;    // HSE ON
+    RCC->CR |= RCC_CR_HSEON;
     while((RCC->CR & RCC_CR_HSERDY) == 0);
 
     RCC->PLLCFGR = PLL_M(PLL_M_Val) | PLL_Q(PLL_Q_Val) | PLL_N(PLL_N_Val) | PLL_P(PLL_P_Val) | RCC_PLLCFGR_PLLSRC_HSE;
@@ -20,8 +20,7 @@ void RCC_InitClocks()
     // enable prefetch and art accelerator
     FLASH->ACR |= (1 << 9) | (1 << 8);
 
-    // Now, switch ON the PLL
-    RCC->CR |= RCC_CR_PLLON;    // PLL ON
+    RCC->CR |= RCC_CR_PLLON;
     while((RCC->CR & 0x02000000) == 0);
 
     // wait till PLL is really used as SYSCLK

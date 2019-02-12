@@ -43,7 +43,6 @@ typedef struct
 #define RCC_BASE    (AHB1PERIPH_BASE + 0x3800)
 #define RCC         ((RCC_t *) RCC_BASE)
 
-/***  RCC_AHB1ENR register  ***/
 #define RCC_AHB1ENR_GPIOAEN ((uint32_t)0x00000001)
 #define RCC_AHB1ENR_GPIOBEN ((uint32_t)0x00000002)
 #define RCC_AHB1ENR_GPIOCEN ((uint32_t)0x00000004)
