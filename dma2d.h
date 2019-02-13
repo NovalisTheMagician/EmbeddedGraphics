@@ -81,7 +81,7 @@ typedef struct
     uint32_t offset;
     PF_PixelFormat pixelFormat;
     uint32_t color;
-} DMA2D_Image_t;
+} DMA2D_image_t;
 
 typedef enum
 {
@@ -92,9 +92,9 @@ typedef enum
 } DMA2D_TransferType;
 
 void DMA2D_Init();
-void DMA2D_SetForeground(DMA2D_Image_t *imageDef);
-void DMA2D_SetBackground(DMA2D_Image_t *imageDef);
-void DMA2D_SetOutput(DMA2D_Image_t *imageDef, uint16_t width, uint16_t height);
+void DMA2D_SetForeground(DMA2D_image_t *imageDef);
+void DMA2D_SetBackground(DMA2D_image_t *imageDef);
+void DMA2D_SetOutput(DMA2D_image_t *imageDef, uint16_t width, uint16_t height);
 void DMA2D_StartTransfer(DMA2D_TransferType transferType);
 
 #endif

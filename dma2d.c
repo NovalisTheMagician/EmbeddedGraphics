@@ -6,7 +6,7 @@ void DMA2D_Init()
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
 }
 
-void DMA2D_SetForeground(DMA2D_Image_t *imageDef)
+void DMA2D_SetForeground(DMA2D_image_t *imageDef)
 {
     DMA2D->FGPFCCR = imageDef->pixelFormat;
     DMA2D->FGCOLR = imageDef->color;
@@ -14,7 +14,7 @@ void DMA2D_SetForeground(DMA2D_Image_t *imageDef)
     DMA2D->FGOR = imageDef->offset;
 }
 
-void DMA2D_SetBackground(DMA2D_Image_t *imageDef)
+void DMA2D_SetBackground(DMA2D_image_t *imageDef)
 {
     DMA2D->BGPFCCR = imageDef->pixelFormat;
     DMA2D->BGCOLR = imageDef->color;
@@ -22,7 +22,7 @@ void DMA2D_SetBackground(DMA2D_Image_t *imageDef)
     DMA2D->BGOR = imageDef->offset;
 }
 
-void DMA2D_SetOutput(DMA2D_Image_t *imageDef, uint16_t width, uint16_t height)
+void DMA2D_SetOutput(DMA2D_image_t *imageDef, uint16_t width, uint16_t height)
 {
     DMA2D->OPFCCR = imageDef->pixelFormat;
     DMA2D->OCOLR = imageDef->color;
