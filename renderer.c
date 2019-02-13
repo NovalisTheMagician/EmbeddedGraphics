@@ -233,7 +233,7 @@ void REN_DrawCircle(int x, int y, int radius, color_t color)
     int _y = 0;
     int dx = 1;
     int dy = 1;
-    int err = dx - (radius / 2);
+    int err = dx - (radius * 2);
 
     while(_x >= _y)
     {
@@ -257,7 +257,7 @@ void REN_DrawCircle(int x, int y, int radius, color_t color)
         {
             _x--;
             dx += 2;
-            err += dx - (radius / 2);
+            err += dx - (radius * 2);
         }
     }
 }
