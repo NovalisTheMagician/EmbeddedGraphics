@@ -134,7 +134,10 @@ void REN_DrawLine(int x0, int y0, int x1, int y1, color_t color)
     if(x0 < 0) x0 = 0;
     if(y0 < 0) y0 = 0;
 
-    if((x0 - x1) == 0)
+    int dx = abs(x1 - x0);
+    int dy = abs(y1 - y0);
+
+    if(dx == 0)
     {
         if(y0 < y1)
             REN_VerticalLine(x0, y0, y1 - y0, color);
@@ -143,7 +146,7 @@ void REN_DrawLine(int x0, int y0, int x1, int y1, color_t color)
         return;
     }
 
-    if((y0 - y1) == 0)
+    if(dy == 0)
     {
         if(x0 < x1)
             REN_HorizontalLine(x0, y0, x1 - x0, color);
@@ -152,8 +155,6 @@ void REN_DrawLine(int x0, int y0, int x1, int y1, color_t color)
         return;
     }
 
-    int dx = abs(x1 - x0);
-    int dy = abs(y1 - y0);
     int sx = x0 < x1 ? 1 : -1;
     int sy = y0 < y1 ? 1 : -1;
 
@@ -227,49 +228,49 @@ void REN_FillRect(int x, int y, int width, int height, color_t color)
     DMA2D_StartTransfer(TT_REGTOMEM);
 }
 
-void REN_DrawCircle(int x, int y, int radius, color_t color)
+void REN_DrawCircle(int xc, int yc, int radius, color_t color)
 {
-    int _x = radius - 1;
-    int _y = 0;
+    int x = radius - 1;
+    int y = 0;
     int dx = 1;
     int dy = 1;
     int err = dx - (radius * 2);
 
-    while(_x >= _y)
+    while(x >= y)
     {
-        REN_PutPixel(x + _x, y + _y, color);
-        REN_PutPixel(x + _y, y + _x, color);
-        REN_PutPixel(x - _y, y + _x, color);
-        REN_PutPixel(x - _x, y + _y, color);
-        REN_PutPixel(x - _x, y - _y, color);
-        REN_PutPixel(x - _y, y - _x, color);
-        REN_PutPixel(x + _y, y - _x, color);
-        REN_PutPixel(x + _x, y - _y, color);
+        REN_PutPixel(xc + x, yc + y, color);
+        REN_PutPixel(xc + y, yc + x, color);
+        REN_PutPixel(xc - y, yc + x, color);
+        REN_PutPixel(xc - x, yc + y, color);
+        REN_PutPixel(xc - x, yc - y, color);
+        REN_PutPixel(xc - y, yc - x, color);
+        REN_PutPixel(xc + y, yc - x, color);
+        REN_PutPixel(xc + x, yc - y, color);
 
         if(err <= 0)
         {
-            _y++;
+            y++;
             err += dy;
             dy += 2;
         }
 
         if(err > 0)
         {
-            _x--;
+            x--;
             dx += 2;
             err += dx - (radius * 2);
         }
     }
 }
 
-void REN_FillCircle(int x, int y, int radius, color_t color)
+void REN_FillCircle(int xc, int yc, int radius, color_t color)
 {
-    for(int _y = -radius; _y <= radius; ++_y)
+    for(int y = -radius; y <= radius; ++y)
     {
-        for(int _x = -radius; _x <= radius; ++_x)
+        for(int x = -radius; x <= radius; ++x)
         {
-            if((_x * _x) + (_y * _y) <= (radius * radius))
-                REN_PutPixel(x + _x, y + _y, color);
+            if((x * x) + (y * y) <= (radius * radius))
+                REN_PutPixel(xc + x, yc + y, color);
         }
     }
 }
