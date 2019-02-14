@@ -4,6 +4,8 @@
 #include "rcc.h"
 #include "sdram.h"
 
+#include "nvic.h"
+
 #include "delay.h"
 
 #define DISP_PORT GPIOI
@@ -38,6 +40,22 @@ void TFT_Init()
 	LTDC->IER = (1 << 3);
 
     LTDC->GCR |= LTDC_GCR_LTDCEN;
+
+	NVIC_EnableIRQ(LCD_IRQn);
+}
+
+static volatile int vblank = 0;
+
+void TFT_WaitForVSYNC()
+{
+	while(!vblank);
+    vblank = 0;
+}
+
+void LCDHandler()
+{
+    vblank = 1;
+    LTDC->ICR = (1 << 3);
 }
 
 static void SetupGPIO()

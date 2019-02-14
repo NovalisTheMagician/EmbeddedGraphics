@@ -13,5 +13,6 @@
 #define VBP   2
 
 void TFT_Init();
+void TFT_WaitForVSYNC();
 
 #endif

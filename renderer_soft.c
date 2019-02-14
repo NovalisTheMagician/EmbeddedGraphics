@@ -1,11 +1,11 @@
-#include "renderer.h"
+#include "renderer_soft.h"
 
 #include "math.h"
 #include "stdlib.h"
 
 #include "tft.h"
+#include "layer.h"
 
-#include "nvic.h"
 #include "pixelformat.h"
 
 extern unsigned long _sframebuf;
@@ -23,7 +23,7 @@ static color_t *currentBuffer;
 
 static viewport_t currentViewport;
 
-void REN_Init(viewport_t viewport)
+void RENS_Init(viewport_t viewport)
 {
     currentViewport.x = viewport.x;
     currentViewport.y = viewport.y;
@@ -42,11 +42,9 @@ void REN_Init(viewport_t viewport)
     LAYER_Reload(true);
 
     LAYER_Enable(LAYER1);
-
-    NVIC_EnableIRQ(LCD_IRQn);
 }
 
-void REN_Clear(color_t color)
+void RENS_Clear(color_t color)
 {
     uint32_t width = currentViewport.width;
     uint32_t height = currentViewport.height;
@@ -56,7 +54,7 @@ void REN_Clear(color_t color)
     }
 }
 
-void REN_PutPixel(int x, int y, color_t color)
+void RENS_PutPixel(int x, int y, color_t color)
 {
     uint32_t width = currentViewport.width;
     uint32_t height = currentViewport.height;
@@ -68,45 +66,48 @@ void REN_PutPixel(int x, int y, color_t color)
     currentBuffer[offset] = color;
 }
 
-void REN_VerticalLine(int x, int y, int length, color_t color)
+void RENS_VerticalLine(int x, int y, int length, color_t color)
 {
     for(int cy = 0; cy < length; ++cy)
     {
-        REN_PutPixel(x, cy + y, color);
+        RENS_PutPixel(x, cy + y, color);
     }
 }
 
-void REN_HorizontalLine(int x, int y, int length, color_t color)
+void RENS_HorizontalLine(int x, int y, int length, color_t color)
 {
     for(int cx = 0; cx < length; ++cx)
     {
-        REN_PutPixel(cx + x, y, color);
+        RENS_PutPixel(cx + x, y, color);
     }
 }
 
-void REN_DrawLine(int x0, int y0, int x1, int y1, color_t color)
+void RENS_DrawLine(int x0, int y0, int x1, int y1, color_t color)
 {
-    
-    if((x0 - x1) == 0)
-    {
-        if(y0 < y1)
-            REN_VerticalLine(x0, y0, y1 - y0, color);
-        else
-            REN_VerticalLine(x0, y1, y0 - y1, color);
-        return;
-    }
-
-    if((y0 - y1) == 0)
-    {
-        if(x0 < x1)
-            REN_HorizontalLine(x0, y0, x1 - x0, color);
-        else
-            REN_HorizontalLine(x1, y0, x0 - x1, color);
-        return;
-    }
+    if(x0 < 0) x0 = 0;
+    if(y0 < 0) y0 = 0;
 
     int dx = abs(x1 - x0);
     int dy = abs(y1 - y0);
+
+    if(dx == 0)
+    {
+        if(y0 < y1)
+            RENS_VerticalLine(x0, y0, y1 - y0, color);
+        else
+            RENS_VerticalLine(x0, y1, y0 - y1, color);
+        return;
+    }
+
+    if(dy == 0)
+    {
+        if(x0 < x1)
+            RENS_HorizontalLine(x0, y0, x1 - x0, color);
+        else
+            RENS_HorizontalLine(x1, y0, x0 - x1, color);
+        return;
+    }
+
     int sx = x0 < x1 ? 1 : -1;
     int sy = y0 < y1 ? 1 : -1;
 
@@ -115,7 +116,7 @@ void REN_DrawLine(int x0, int y0, int x1, int y1, color_t color)
 
     do
     {
-        REN_PutPixel(x0, y0, color);
+        RENS_PutPixel(x0, y0, color);
         
         e2 = err;
         if(e2 > -dx)
@@ -132,74 +133,74 @@ void REN_DrawLine(int x0, int y0, int x1, int y1, color_t color)
     while(x0 != x1 && y0 != y1);
 }
 
-void REN_DrawRect(int x, int y, int width, int height, color_t color)
+void RENS_DrawRect(int x, int y, int width, int height, color_t color)
 {
-    REN_HorizontalLine(x, y, width, color);
-    REN_HorizontalLine(x, y + (height - 1), width, color);
-    REN_VerticalLine(x, y, height, color);
-    REN_VerticalLine(x + (width - 1), y, height, color);
+    RENS_HorizontalLine(x, y, width, color);
+    RENS_HorizontalLine(x, y + (height - 1), width, color);
+    RENS_VerticalLine(x, y, height, color);
+    RENS_VerticalLine(x + (width - 1), y, height, color);
 }
 
-void REN_FillRect(int x, int y, int width, int height, color_t color)
+void RENS_FillRect(int x, int y, int width, int height, color_t color)
 {
     for(int cy = 0; cy < height; ++cy)
     {
-        REN_HorizontalLine(x, cy + y, width, color);
+        RENS_HorizontalLine(x, cy + y, width, color);
     }
 }
 
-void REN_DrawCircle(int x, int y, int radius, color_t color)
+void RENS_DrawCircle(int xc, int yc, int radius, color_t color)
 {
-    int _x = radius - 1;
-    int _y = 0;
+    int x = radius - 1;
+    int y = 0;
     int dx = 1;
     int dy = 1;
-    int err = dx - (radius / 2);
+    int err = dx - (radius * 2);
 
-    while(_x >= _y)
+    while(x >= y)
     {
-        REN_PutPixel(x + _x, y + _y, color);
-        REN_PutPixel(x + _y, y + _x, color);
-        REN_PutPixel(x - _y, y + _x, color);
-        REN_PutPixel(x - _x, y + _y, color);
-        REN_PutPixel(x - _x, y - _y, color);
-        REN_PutPixel(x - _y, y - _x, color);
-        REN_PutPixel(x + _y, y - _x, color);
-        REN_PutPixel(x + _x, y - _y, color);
+        RENS_PutPixel(xc + x, yc + y, color);
+        RENS_PutPixel(xc + y, yc + x, color);
+        RENS_PutPixel(xc - y, yc + x, color);
+        RENS_PutPixel(xc - x, yc + y, color);
+        RENS_PutPixel(xc - x, yc - y, color);
+        RENS_PutPixel(xc - y, yc - x, color);
+        RENS_PutPixel(xc + y, yc - x, color);
+        RENS_PutPixel(xc + x, yc - y, color);
 
         if(err <= 0)
         {
-            _y++;
+            y++;
             err += dy;
             dy += 2;
         }
 
         if(err > 0)
         {
-            _x--;
+            x--;
             dx += 2;
-            err += dx - (radius / 2);
+            err += dx - (radius * 2);
         }
     }
 }
 
-void REN_FillCircle(int x, int y, int radius, color_t color)
+void RENS_FillCircle(int xc, int yc, int radius, color_t color)
 {
-    for(int _y = -radius; _y <= radius; ++_y)
+    for(int y = -radius; y <= radius; ++y)
     {
-        for(int _x = -radius; _x <= radius; ++_x)
+        for(int x = -radius; x <= radius; ++x)
         {
-            if((_x * _x) + (_y * _y) <= (radius * radius))
-                REN_PutPixel(x + _x, y + _y, color);
+            if((x * x) + (y * y) <= (radius * radius))
+                RENS_PutPixel(xc + x, yc + y, color);
         }
     }
 }
 
-void REN_DrawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color)
+void RENS_DrawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color)
 {
-    REN_DrawLine(x0, y0, x1, y1, color);
-    REN_DrawLine(x1, y1, x2, y2, color);
-    REN_DrawLine(x2, y2, x0, y0, color);
+    RENS_DrawLine(x0, y0, x1, y1, color);
+    RENS_DrawLine(x1, y1, x2, y2, color);
+    RENS_DrawLine(x2, y2, x0, y0, color);
 }
 
 static int min(int a, int b)
@@ -217,7 +218,7 @@ static int halfspace(int ax, int ay, int bx, int by, int cx, int cy)
     return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
 }
 
-void REN_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color)
+void RENS_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color)
 {
     uint32_t width = currentViewport.width;
     uint32_t height = currentViewport.height;
@@ -241,7 +242,7 @@ void REN_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t co
             int w2 = halfspace(x0, y0, x1, y1, px, py);
 
             if(w0 >= 0 && w1 >= 0 && w2 >= 0)
-                REN_PutPixel(px, py, color);
+                RENS_PutPixel(px, py, color);
         }
     }
 }
@@ -255,12 +256,12 @@ static void BlitGlyph(int x, int y, int glyph, color_t color)
             int index =  glyph + _x + _y * GLYPH_WIDTH;
             uint8_t fontColor = FONT[index];
             if(fontColor != 0x00)
-                REN_PutPixel(x + _x, y + _y, color);
+                RENS_PutPixel(x + _x, y + _y, color);
         }
     }
 }
 
-void REN_DrawString(const char *string, int x, int y, color_t color)
+void RENS_DrawString(const char *string, int x, int y, color_t color)
 {
     int GLYPH_SIZE = GLYPH_WIDTH * GLYPH_HEIGHT;
 
@@ -286,16 +287,13 @@ void REN_DrawString(const char *string, int x, int y, color_t color)
     }
 }
 
-static volatile int vblank = 0;
-
-void REN_Flip(bool waitForVBlank)
+void RENS_Flip(bool waitForVBlank)
 {
     LAYER_SetFramebuffer(LAYER1, currentBuffer);
     if(waitForVBlank)
     {
         LAYER_Reload(false);
-        while(!vblank);
-        vblank = 0;
+        TFT_WaitForVSYNC();
     }
     else
     {
@@ -306,10 +304,4 @@ void REN_Flip(bool waitForVBlank)
         currentBuffer = backBuffer;
     else
         currentBuffer = frontBuffer;
-}
-
-void LCDHandler()
-{
-    vblank = 1;
-    LTDC->ICR = (1 << 3);
 }

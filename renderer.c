@@ -5,7 +5,7 @@
 
 #include "dma2d.h"
 #include "pixelformat.h"
-#include "nvic.h"
+#include "tft.h"
 
 #include "layer.h"
 
@@ -45,8 +45,6 @@ void REN_Init(viewport_t viewport)
     LAYER_Enable(LAYER1);
 
     DMA2D_Init();
-
-    NVIC_EnableIRQ(LCD_IRQn);
 }
 
 void REN_Clear(color_t color)
@@ -379,16 +377,13 @@ void REN_DrawString(const char *string, int x, int y, color_t color)
     }
 }
 
-static volatile int vblank = 0;
-
 void REN_Flip(bool waitForVBlank)
 {
     LAYER_SetFramebuffer(LAYER1, currentBuffer);
     if(waitForVBlank)
     {
         LAYER_Reload(false);
-        while(!vblank);
-        vblank = 0;
+        TFT_WaitForVSYNC();
     }
     else
     {
@@ -399,10 +394,4 @@ void REN_Flip(bool waitForVBlank)
         currentBuffer = backBuffer;
     else
         currentBuffer = frontBuffer;
-}
-
-void LCDHandler()
-{
-    vblank = 1;
-    LTDC->ICR = (1 << 3);
 }
