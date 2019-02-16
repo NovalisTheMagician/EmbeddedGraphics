@@ -1,6 +1,10 @@
 #include "renderer_soft.h"
 
-#include "math.h"
+#include <math.h>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #include "stdlib.h"
 
 #include "tft.h"
@@ -133,6 +137,48 @@ void RENS_DrawLine(int x0, int y0, int x1, int y1, color_t color)
     while(x0 != x1 && y0 != y1);
 }
 
+static void swap(int *v1, int *v2)
+{
+    int tmp = *v2;
+    *v2 = *v1;
+    *v1 = tmp;
+}
+
+void RENS_DrawLineNaive(int x0, int y0, int x1, int y1, color_t color)
+{
+    if (x0 > x1)
+	{
+		swap(&x0, &x1);
+		swap(&y0, &y1);
+	}
+
+	float dx = (float)x1 - x0;
+	float dy = (float)y1 - y0;
+
+	if (dy > dx)
+	{
+		float slope = dx / dy;
+
+		float x = (float)x0;
+		for (int y = y0; y <= y1; ++y)
+		{
+			RENS_PutPixel((int)roundf(x), y, color);
+			x += slope;
+		}
+	}
+	else
+	{
+		float slope = dy / dx;
+
+		float y = (float)y0;
+		for (int x = x0; x <= x1; ++x)
+		{
+			RENS_PutPixel(x, (int)roundf(y), color);
+			y += slope;
+		}
+	}
+}
+
 void RENS_DrawRect(int x, int y, int width, int height, color_t color)
 {
     RENS_HorizontalLine(x, y, width, color);
@@ -182,6 +228,22 @@ void RENS_DrawCircle(int xc, int yc, int radius, color_t color)
             err += dx - (radius * 2);
         }
     }
+}
+
+static float DegToRad(float deg)
+{
+	return deg * (180.0f / (float)M_PI);
+}
+
+void RENS_DrawCircleNaive(int xc, int yc, int radius, color_t color)
+{
+    for (int i = 0; i < 360; ++i)
+	{
+		float x = xc + cosf(DegToRad((float)i)) * radius;
+		float y = yc + sinf(DegToRad((float)i)) * radius;
+
+		RENS_PutPixel((int)roundf(x), (int)roundf(y), color);
+	}
 }
 
 void RENS_FillCircle(int xc, int yc, int radius, color_t color)

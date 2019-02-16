@@ -1,16 +1,15 @@
 #include "delay.h"
 
-volatile uint32_t systick_millis_count = 0;
+static volatile uint32_t systickMillisCount = 0;
 
 void SystickHandler()
 {
-    ++systick_millis_count;
+    ++systickMillisCount;
 }
 
 uint32_t millis()
 {
-    volatile uint32_t ret = systick_millis_count;
-    return ret;
+    return systickMillisCount;
 }
 
 void delay(uint32_t ms)
