@@ -97,23 +97,24 @@ static void swap(int *v1, int *v2)
 
 void RENS_DrawLine(int x0, int y0, int x1, int y1, color_t color)
 {
-    if (x0 > x1)
-	{
-		swap(&x0, &x1);
-		swap(&y0, &y1);
-	}
+    if(x1 < x0)
+    {
+        swap(&x0, &x1);
+        swap(&y0, &y1);
+    }
 
 	float dx = (float)x1 - x0;
 	float dy = (float)y1 - y0;
 
-    float slope = dy / dx;
+    int xStep = dx > 0 ? 1 : -1;
+    int yStep = dy > 0 ? 1 : -1;
 
-	if (dy > dx)
+	if (fabs(dy) > fabs(dx))
 	{
-		slope = 1.0f / slope;
+		float slope = dx / dy;
 
 		float x = (float)x0;
-		for (int y = y0; y <= y1; ++y)
+		for (int y = y0; y != y1; y += yStep)
 		{
 			RENS_PutPixel((int)roundf(x), y, color);
 			x += slope;
@@ -121,8 +122,10 @@ void RENS_DrawLine(int x0, int y0, int x1, int y1, color_t color)
 	}
 	else
 	{
+        float slope = dy / dx;
+
 		float y = (float)y0;
-		for (int x = x0; x <= x1; ++x)
+		for (int x = x0; x != x1; x += xStep)
 		{
 			RENS_PutPixel(x, (int)roundf(y), color);
 			y += slope;
