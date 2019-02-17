@@ -10,6 +10,8 @@
 #include "tft.h"
 #include "layer.h"
 
+#include "vector.h"
+
 #include "pixelformat.h"
 
 extern unsigned long _sframebuf;
@@ -86,57 +88,6 @@ void RENS_HorizontalLine(int x, int y, int length, color_t color)
     }
 }
 
-void RENS_DrawLine(int x0, int y0, int x1, int y1, color_t color)
-{
-    if(x0 < 0) x0 = 0;
-    if(y0 < 0) y0 = 0;
-
-    int dx = abs(x1 - x0);
-    int dy = abs(y1 - y0);
-
-    if(dx == 0)
-    {
-        if(y0 < y1)
-            RENS_VerticalLine(x0, y0, y1 - y0, color);
-        else
-            RENS_VerticalLine(x0, y1, y0 - y1, color);
-        return;
-    }
-
-    if(dy == 0)
-    {
-        if(x0 < x1)
-            RENS_HorizontalLine(x0, y0, x1 - x0, color);
-        else
-            RENS_HorizontalLine(x1, y0, x0 - x1, color);
-        return;
-    }
-
-    int sx = x0 < x1 ? 1 : -1;
-    int sy = y0 < y1 ? 1 : -1;
-
-    int err = (dx > dy ? dx : -dy) / 2;
-    int e2;
-
-    do
-    {
-        RENS_PutPixel(x0, y0, color);
-        
-        e2 = err;
-        if(e2 > -dx)
-        {
-            err -= dy;
-            x0 += sx;
-        }
-        if(e2 < dy)
-        {
-            err += dx;
-            y0 += sy;
-        }
-    }
-    while(x0 != x1 && y0 != y1);
-}
-
 static void swap(int *v1, int *v2)
 {
     int tmp = *v2;
@@ -144,7 +95,7 @@ static void swap(int *v1, int *v2)
     *v1 = tmp;
 }
 
-void RENS_DrawLineNaive(int x0, int y0, int x1, int y1, color_t color)
+void RENS_DrawLine(int x0, int y0, int x1, int y1, color_t color)
 {
     if (x0 > x1)
 	{
@@ -155,9 +106,11 @@ void RENS_DrawLineNaive(int x0, int y0, int x1, int y1, color_t color)
 	float dx = (float)x1 - x0;
 	float dy = (float)y1 - y0;
 
+    float slope = dy / dx;
+
 	if (dy > dx)
 	{
-		float slope = dx / dy;
+		slope = 1.0f / slope;
 
 		float x = (float)x0;
 		for (int y = y0; y <= y1; ++y)
@@ -168,8 +121,6 @@ void RENS_DrawLineNaive(int x0, int y0, int x1, int y1, color_t color)
 	}
 	else
 	{
-		float slope = dy / dx;
-
 		float y = (float)y0;
 		for (int x = x0; x <= x1; ++x)
 		{
@@ -195,52 +146,17 @@ void RENS_FillRect(int x, int y, int width, int height, color_t color)
     }
 }
 
-void RENS_DrawCircle(int xc, int yc, int radius, color_t color)
-{
-    int x = radius - 1;
-    int y = 0;
-    int dx = 1;
-    int dy = 1;
-    int err = dx - (radius * 2);
-
-    while(x >= y)
-    {
-        RENS_PutPixel(xc + x, yc + y, color);
-        RENS_PutPixel(xc + y, yc + x, color);
-        RENS_PutPixel(xc - y, yc + x, color);
-        RENS_PutPixel(xc - x, yc + y, color);
-        RENS_PutPixel(xc - x, yc - y, color);
-        RENS_PutPixel(xc - y, yc - x, color);
-        RENS_PutPixel(xc + y, yc - x, color);
-        RENS_PutPixel(xc + x, yc - y, color);
-
-        if(err <= 0)
-        {
-            y++;
-            err += dy;
-            dy += 2;
-        }
-
-        if(err > 0)
-        {
-            x--;
-            dx += 2;
-            err += dx - (radius * 2);
-        }
-    }
-}
-
 static float DegToRad(float deg)
 {
 	return deg * (180.0f / (float)M_PI);
 }
 
-void RENS_DrawCircleNaive(int xc, int yc, int radius, color_t color)
+void RENS_DrawCircle(int xc, int yc, int radius, color_t color)
 {
-    for (int i = 0; i < 360; ++i)
+    for (int angle = 0; angle < 360; ++angle)
 	{
-		float x = xc + cosf(DegToRad((float)i)) * radius;
-		float y = yc + sinf(DegToRad((float)i)) * radius;
+		float x = xc + cosf(DegToRad((float)angle)) * radius;
+		float y = yc + sinf(DegToRad((float)angle)) * radius;
 
 		RENS_PutPixel((int)roundf(x), (int)roundf(y), color);
 	}
@@ -275,38 +191,37 @@ static int max(int a, int b)
     return a > b ? a : b;
 }
 
-static int halfspace(int ax, int ay, int bx, int by, int cx, int cy)
+static int area(ivector_t a, ivector_t b, ivector_t c)
 {
-    return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+	return labs((a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y)) / 2);
 }
 
 void RENS_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color)
 {
-    uint32_t width = currentViewport.width;
-    uint32_t height = currentViewport.height;
+	int minX = min(x0, min(x1, x2));
+	int minY = min(y0, min(y1, y2));
+	int maxX = max(x0, max(x1, x2));
+	int maxY = max(y0, max(y1, y2));
 
-    int minX = min(x0, min(x1, x2));
-    int minY = min(y0, min(y1, y2));
-    int maxX = max(x0, max(x1, x2));
-    int maxY = max(y0, max(y1, y2));
+	ivector_t v0 = { x0, y0 };
+	ivector_t v1 = { x1, y1 };
+	ivector_t v2 = { x2, y2 };
 
-    minX = max(minX, 0);
-    minY = max(minY, 0);
-    maxX = min(maxX, width - 1);
-    maxY = min(maxY, height - 1);
+	for (int py = minY; py < maxY; ++py)
+	{
+		for (int px = minX; px < maxX; ++px)
+		{
+			ivector_t p = { px, py };
 
-    for(int py = minY; py < maxY; ++py)
-    {
-        for(int px = minX; px < maxX; ++px)
-        {
-            int w0 = halfspace(x1, y1, x2, y2, px, py);
-            int w1 = halfspace(x2, y2, x0, y0, px, py);
-            int w2 = halfspace(x0, y0, x1, y1, px, py);
-
-            if(w0 >= 0 && w1 >= 0 && w2 >= 0)
-                RENS_PutPixel(px, py, color);
-        }
-    }
+			int areaTotal = area(v0, v1, v2);
+			int area1 = area(v0, v1, p);
+			int area2 = area(v1, v2, p);
+			int area3 = area(v2, v0, p);
+			
+			if((area1 + area2 + area3) == areaTotal)
+				RENS_PutPixel(p.x, p.y, color);
+		}
+	}
 }
 
 static void BlitGlyph(int x, int y, int glyph, color_t color)

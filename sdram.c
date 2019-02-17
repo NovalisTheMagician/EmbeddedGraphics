@@ -3,13 +3,13 @@
 #include "gpio.h"
 #include "sdram.h"
 
-#define TMRD(x) (x << 0)
-#define TXSR(x) (x << 4)
-#define TRAS(x) (x << 8)
-#define TRC(x)  (x << 12)
-#define TWR(x)  (x << 16)
-#define TRP(x)  (x << 20)
-#define TRCD(x) (x << 24)
+#define TMRD(x) ((x) << 0)
+#define TXSR(x) ((x) << 4)
+#define TRAS(x) ((x) << 8)
+#define TRC(x)  ((x) << 12)
+#define TWR(x)  ((x) << 16)
+#define TRP(x)  ((x) << 20)
+#define TRCD(x) ((x) << 24)
 
 static void SetupGPIO();
 
@@ -41,8 +41,8 @@ void SDRAM_Init()
 	SDRAM->SDRTR |= (0x0603 << 1);
 	while(SDRAM->SDSR & FMC_SDSR_BUSY);
 
-	uint32_t temp = SDRAM->SDCR[0];
-	SDRAM->SDCR[0] = (temp & ~FMC_SDCR_WP);
+	// Clear the WriteProtect bit
+	SDRAM->SDCR[0] &= ~FMC_SDCR_WP;
 }
 
 static void SetupGPIO()
