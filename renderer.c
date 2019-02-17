@@ -7,6 +7,8 @@
 #include "pixelformat.h"
 #include "tft.h"
 
+#include "vector.h"
+
 #include "layer.h"
 
 extern unsigned long _sframebuf;
@@ -127,55 +129,46 @@ void REN_HorizontalLine(int x, int y, int length, color_t color)
     DMA2D_StartTransfer(TT_REGTOMEM);
 }
 
+static void swap(int *v1, int *v2)
+{
+    int tmp = *v2;
+    *v2 = *v1;
+    *v1 = tmp;
+}
+
 void REN_DrawLine(int x0, int y0, int x1, int y1, color_t color)
 {
-    if(x0 < 0) x0 = 0;
-    if(y0 < 0) y0 = 0;
+    if (x0 > x1)
+	{
+		swap(&x0, &x1);
+		swap(&y0, &y1);
+	}
 
-    int dx = abs(x1 - x0);
-    int dy = abs(y1 - y0);
+	float dx = (float)x1 - x0;
+	float dy = (float)y1 - y0;
 
-    if(dx == 0)
-    {
-        if(y0 < y1)
-            REN_VerticalLine(x0, y0, y1 - y0, color);
-        else
-            REN_VerticalLine(x0, y1, y0 - y1, color);
-        return;
-    }
+    float slope = dy / dx;
 
-    if(dy == 0)
-    {
-        if(x0 < x1)
-            REN_HorizontalLine(x0, y0, x1 - x0, color);
-        else
-            REN_HorizontalLine(x1, y0, x0 - x1, color);
-        return;
-    }
+	if (dy > dx)
+	{
+		slope = 1.0f / slope;
 
-    int sx = x0 < x1 ? 1 : -1;
-    int sy = y0 < y1 ? 1 : -1;
-
-    int err = (dx > dy ? dx : -dy) / 2;
-    int e2;
-
-    do
-    {
-        REN_PutPixel(x0, y0, color);
-        
-        e2 = err;
-        if(e2 > -dx)
-        {
-            err -= dy;
-            x0 += sx;
-        }
-        if(e2 < dy)
-        {
-            err += dx;
-            y0 += sy;
-        }
-    }
-    while(x0 != x1 && y0 != y1);
+		float x = (float)x0;
+		for (int y = y0; y <= y1; ++y)
+		{
+			REN_PutPixel((int)roundf(x), y, color);
+			x += slope;
+		}
+	}
+	else
+	{
+		float y = (float)y0;
+		for (int x = x0; x <= x1; ++x)
+		{
+			REN_PutPixel(x, (int)roundf(y), color);
+			y += slope;
+		}
+	}
 }
 
 void REN_DrawRect(int x, int y, int width, int height, color_t color)
@@ -280,48 +273,93 @@ void REN_DrawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t co
     REN_DrawLine(x2, y2, x0, y0, color);
 }
 
-static int min(int a, int b)
+typedef struct
 {
-    return a < b ? a : b;
+    vector_t v0;
+    vector_t v1;
+} edge_t;
+
+static edge_t MakeEdge(vector_t v0, vector_t v1)
+{
+    edge_t edge;
+    if(v0.y < v1.y)
+    {
+        edge.v0 = v0;
+        edge.v1 = v1;
+    }
+    else
+    {
+        edge.v0 = v1;
+        edge.v1 = v0;
+    }
+    
+    return edge;
 }
 
-static int max(int a, int b)
+static void DrawEdgeSpan(edge_t e0, edge_t e1, color_t color)
 {
-    return a > b ? a : b;
-}
+    float e0dy = e0.v1.y - e0.v0.y;
+    if(e0dy == 0.0f)
+        return;
 
-static int halfspace(int ax, int ay, int bx, int by, int cx, int cy)
-{
-    return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+    float e1dy = e1.v1.y - e1.v0.y;
+    if(e1dy == 0.0f)
+        return;
+
+    float e0dx = e0.v1.x - e0.v0.x;
+    float e1dx = e1.v1.x - e1.v0.x;
+
+    float factor0 = (e1.v0.y - e0.v0.y) / e0dy;
+    float factorStep0 = 1.0f / e0dy;
+    float factor1 = 0;
+    float factorStep1 = 1.0f / e1dy;
+
+    for(int y = e1.v0.y; y < e1.v1.y; ++y)
+    {
+        int x1 = (int)roundf(e0.v0.x + (e0dx * factor0));
+        int x2 = (int)roundf(e1.v0.x + (e1dx * factor1));
+        if(x2 < x1)
+        {
+            swap(&x1, &x2);
+        }
+        int length = x2 - x1;
+        REN_HorizontalLine(x1, y, length, color);
+
+        factor0 += factorStep0;
+        factor1 += factorStep1;
+    }
 }
 
 void REN_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color)
 {
-    uint16_t width = currentViewport.width;
-    uint16_t height = currentViewport.height;
+    vector_t v0 = { x0, y0 };
+    vector_t v1 = { x1, y1 };
+    vector_t v2 = { x2, y2 };
 
-    int minX = min(x0, min(x1, x2));
-    int minY = min(y0, min(y1, y2));
-    int maxX = max(x0, max(x1, x2));
-    int maxY = max(y0, max(y1, y2));
-
-    minX = max(minX, 0);
-    minY = max(minY, 0);
-    maxX = min(maxX, width - 1);
-    maxY = min(maxY, height - 1);
-
-    for(int py = minY; py < maxY; ++py)
+    edge_t edges[3] = 
     {
-        for(int px = minX; px < maxX; ++px)
-        {
-            int w0 = halfspace(x1, y1, x2, y2, px, py);
-            int w1 = halfspace(x2, y2, x0, y0, px, py);
-            int w2 = halfspace(x0, y0, x1, y1, px, py);
+        MakeEdge(v0, v1),
+        MakeEdge(v1, v2),
+        MakeEdge(v2, v0)
+    };
 
-            if(w0 >= 0 && w1 >= 0 && w2 >= 0)
-                REN_PutPixel(px, py, color);
+    int maxLength = 0;
+    int longEdge = 0;
+    for(int i = 0; i < 3; ++i)
+    {
+        int length = edges[i].v1.y - edges[i].v0.y;
+        if(length > maxLength)
+        {
+            maxLength = length;
+            longEdge = i;
         }
     }
+
+    int shortEdge1 = (longEdge + 1) % 3;
+    int shortEdge2 = (longEdge + 2) % 3;
+
+    DrawEdgeSpan(edges[longEdge], edges[shortEdge1], color);
+    DrawEdgeSpan(edges[longEdge], edges[shortEdge2], color);
 }
 
 static void BlitGlyph(int x, int y, int glyph, color_t color)
