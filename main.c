@@ -7,9 +7,12 @@
 #include "colors32.h"
 #include <math.h>
 #include "renderer.h"
+#include "renderer_soft.h"
 #include <stdio.h>
 #include "rng.h"
 #include <string.h>
+
+#include "profile.h"
 
 #define LED1 1
 
@@ -19,7 +22,11 @@
 void Test();
 void FunInit();
 void Fun();
-void Profile();
+void ProfileFast(viewport_t viewport);
+void ProfileSlow(viewport_t viewport);
+
+void ProfileFast2(viewport_t viewport);
+void ProfileSlow2(viewport_t viewport);
 
 int main()
 {
@@ -30,6 +37,8 @@ int main()
     viewport_t viewport = {
         0, 0, WIDTH, HEIGHT
     };
+
+    ProfileFast(viewport);
 
     REN_Init(viewport);
 
@@ -111,11 +120,11 @@ void Test()
     REN_DrawLine(100, 100, 200, 150, COL_BLUE);
     REN_DrawLine(100, 100, 150, 200, COL_BLUE);
 
-    //REN_FillTriangle(200, 200, 300, 270, 150, 250, COL_RED);
-    REN_DrawTriangle(200, 200, 300, 270, 150, 250, COL_MAGENTA);
+    REN_FillTriangle(200, 200, 300, 270, 150, 250, COL_RED);
+    //REN_DrawTriangle(200, 200, 300, 270, 150, 250, COL_MAGENTA);
 
-    REN_FillCircle(WIDTH / 2, HEIGHT / 2, 40, COL_BLUE);
-    REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 40, COL_CYAN);
+    //REN_FillCircle(WIDTH / 2, HEIGHT / 2, 40, COL_BLUE);
+    //REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 40, COL_CYAN);
 
     /*
     for(int ny = 0; ny < HEIGHT; ++ny)
@@ -196,11 +205,6 @@ void Fun()
         REN_FillRect(x, y, 16, 16, blocks[i].color);
         //REN_DrawString(blocks[i].letter, x, y, blocks[i].color);
     }
-}
-
-void Profile()
-{
-
 }
 
 /*
