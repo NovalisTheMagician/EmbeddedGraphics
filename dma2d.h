@@ -77,7 +77,7 @@ typedef struct
 
 typedef struct 
 {
-    void const *memoryAddr;
+    const void *memoryAddr;
     uint32_t offset;
     PF_PixelFormat pixelFormat;
     uint32_t color;
@@ -85,10 +85,10 @@ typedef struct
 
 typedef enum
 {
-    TT_REGTOMEM = DMA2D_CR_MODE_REG2MEM,
-    TT_MEMTOMEM = DMA2D_CR_MODE_MEM2MEM,
-    TT_MEMTOMEMPIXELCONV = DMA2D_CR_MODE_MEM2MEMPFC,
-    TT_MEMTOMEMBLEND = DMA2D_CR_MODE_MEM2MEMBLEND
+    TT_REG_TO_MEM = DMA2D_CR_MODE_REG2MEM,
+    TT_MEM_TO_MEM = DMA2D_CR_MODE_MEM2MEM,
+    TT_MEM_TO_MEM_PIXELCONV = DMA2D_CR_MODE_MEM2MEMPFC,
+    TT_MEM_TO_MEM_BLEND = DMA2D_CR_MODE_MEM2MEMBLEND
 } DMA2D_TransferType;
 
 void DMA2D_Init();

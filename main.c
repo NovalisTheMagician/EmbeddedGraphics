@@ -16,29 +16,61 @@
 
 #define LED1 1
 
+#define DEMO_BTN_PIN 11
+
 #define WIDTH 480
 #define HEIGHT 272
 
 void Test();
 void FunInit();
-void Fun();
+void Fun(bool drawRects);
 void ProfileFast(viewport_t viewport);
 void ProfileSlow(viewport_t viewport);
 
 void ProfileFast2(viewport_t viewport);
 void ProfileSlow2(viewport_t viewport);
 
+bool checkDemoBtn();
+
+void DrawGradient();
+void DrawGradient2();
+void DrawGradient3();
+
+void DrawRandLines();
+void DrawRandCircles();
+void DrawRandTriangles();
+
+void buildTriVars();
+
+const char* DEMO_NAMES[] = {
+    "MOVING CHARACTERS (500)",
+    "TEST SCENE",
+    "MOVING BLOCKS (500)",
+    "COLOR GRADIENT (RG)",
+    "COLOR GRADIENT (GB)",
+    "COLOR GRADIENT (RB)",
+    "RANDOM LINES (100)",
+    "RANDOM CIRCLES (50)",
+    "RANDOM TRIANGLES (50)"
+};
+
+int demo = 0;
+const int MAX_DEMO = 9;
+
+const int MAX_DEMO_TIME = 5000;
+
 int main()
 {
     RNG_Init();
 
     GPIO_Conf(GPIOI, LED1, GPIO_MODE_OUT, GPIO_OTYPE_PUSHPULL, GPIO_OSPEED_VERYHIGHSPEED, GPIO_PUD_NONE);
+    GPIO_Conf(GPIOI, DEMO_BTN_PIN, GPIO_MODE_IN, GPIO_OTYPE_PUSHPULL, GPIO_OSPEED_VERYHIGHSPEED, GPIO_PUD_NONE);
 
     viewport_t viewport = {
         0, 0, WIDTH, HEIGHT
     };
 
-    ProfileFast(viewport);
+    //ProfileSlow(viewport);
 
     REN_Init(viewport);
 
@@ -52,13 +84,28 @@ int main()
 
     int fpsVal = 0;
 
+    int demoTime = 0;
+    int prevDemoTime = millis();
+
+    buildTriVars();
+
     FunInit();
 
     while(1)
     {
+        GPIO_WritePin(GPIOI, LED1, GPIO_ReadPin(GPIOI, DEMO_BTN_PIN));
+
         current = millis();
         uint32_t delta = current - last;
         last = current;
+
+        demoTime += delta;
+
+        if(demoTime >= MAX_DEMO_TIME)
+        {
+            demo = (demo + 1) % MAX_DEMO;
+            demoTime -= MAX_DEMO_TIME;
+        }
 
         count += delta;
         fps++;
@@ -72,18 +119,57 @@ int main()
 
         REN_Clear(clearColor);
         
-        //Fun();
-        Test();
-        //Profile();
+        if(demo == 0)
+            Fun(false);
+        else if(demo == 1)
+            Test();
+        else if(demo == 2)
+            Fun(true);
+        else if(demo == 3)
+            DrawGradient();
+        else if(demo == 4)
+            DrawGradient2();
+        else if(demo == 5)
+            DrawGradient3();
+        else if(demo == 6)
+            DrawRandLines();
+        else if(demo == 7)
+            DrawRandCircles();
+        else if(demo == 8)
+            DrawRandTriangles();
+
 
         //delay(RNG_GetRandom() % 33);
 
         char buffer[8];
         sprintf(buffer, "FPS %d", fpsVal);
         REN_DrawString(buffer, 1, 1, COL_YELLOW);
+        REN_DrawString(DEMO_NAMES[demo], 1, 24, COL_YELLOW);
 
         REN_Flip(true);
     }
+}
+
+static bool prevBtnDown = false;
+
+bool checkDemoBtn()
+{
+    bool btn = GPIO_ReadPin(GPIOI, DEMO_BTN_PIN);
+    if(btn && !prevBtnDown)
+    {
+        if(!prevBtnDown)
+        {
+            prevBtnDown = true;
+            return true;
+        }
+        else 
+            return false;
+    }
+    else if(!btn)
+    {
+        prevBtnDown = false;
+    }
+    return false;
 }
 
 static int x = 0, y = 80;
@@ -121,12 +207,14 @@ void Test()
     REN_DrawLine(100, 100, 150, 200, COL_BLUE);
 
     REN_FillTriangle(200, 200, 300, 270, 150, 250, COL_RED);
-    //REN_DrawTriangle(200, 200, 300, 270, 150, 250, COL_MAGENTA);
+    REN_DrawTriangle(200, 200, 300, 270, 150, 250, COL_MAGENTA);
 
-    //REN_FillCircle(WIDTH / 2, HEIGHT / 2, 40, COL_BLUE);
-    //REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 40, COL_CYAN);
+    REN_FillCircle(WIDTH / 2, HEIGHT / 2, 40, COL_BLUE);
+    REN_DrawCircle(WIDTH / 2, HEIGHT / 2, 40, COL_CYAN);
+}
 
-    /*
+void DrawGradient()
+{
     for(int ny = 0; ny < HEIGHT; ++ny)
     {
         for(int nx = 0; nx < WIDTH; ++nx)
@@ -137,7 +225,94 @@ void Test()
             REN_PutPixel(nx, ny, (255 << 24) | (r << 16) | (g << 8));
         }
     }
-    */
+}
+
+void DrawGradient2()
+{
+    for(int ny = 0; ny < HEIGHT; ++ny)
+    {
+        for(int nx = 0; nx < WIDTH; ++nx)
+        {
+            int g = 255 * nx / WIDTH;
+            int b = 255 * ny / HEIGHT;
+
+            REN_PutPixel(nx, ny, (255 << 24) | (g << 8) | (b << 0));
+        }
+    }
+}
+
+void DrawGradient3()
+{
+    for(int ny = 0; ny < HEIGHT; ++ny)
+    {
+        for(int nx = 0; nx < WIDTH; ++nx)
+        {
+            int r = 255 * nx / WIDTH;
+            int b = 255 * ny / HEIGHT;
+
+            REN_PutPixel(nx, ny, (255 << 24) | (r << 16) | (b << 0));
+        }
+    }
+}
+
+void DrawRandLines()
+{
+    for(int i = 0; i < 100; ++i)
+    {
+        int x0 = RNG_GetRandom() % WIDTH;
+        int y0 = RNG_GetRandom() % HEIGHT;
+        int x1 = RNG_GetRandom() % WIDTH;
+        int y1 = RNG_GetRandom() % HEIGHT;
+        uint32_t color = RNG_GetRandom() | (0xFF << 24);
+        REN_DrawLine(x0, y0, x1, y1, color);
+    }
+}
+
+void DrawRandCircles()
+{
+    for(int i = 0; i < 50; ++i)
+    {
+        int radius = RNG_GetRandom() % 30;
+
+        int x0 = radius + (RNG_GetRandom() % (WIDTH - radius));
+        int y0 = radius + (RNG_GetRandom() % (HEIGHT - radius));
+        
+        uint32_t color = RNG_GetRandom() | (0xFF << 24);
+        REN_FillCircle(x0, y0, radius, color);
+    }
+}
+
+int _x0;
+int _y0;
+int _x1;
+int _y1;
+int _x2;
+int _y2;
+
+void buildTriVars()
+{
+    _x0 = RNG_GetRandom() % WIDTH;
+    _y0 = RNG_GetRandom() % HEIGHT;
+    _x1 = RNG_GetRandom() % WIDTH;
+    _y1 = RNG_GetRandom() % HEIGHT;
+    _x2 = RNG_GetRandom() % WIDTH;
+    _y2 = RNG_GetRandom() % HEIGHT;
+}
+
+void DrawRandTriangles()
+{
+    for(int i = 0; i < 50; ++i)
+    {
+        int x0 = RNG_GetRandom() % WIDTH;
+        int y0 = RNG_GetRandom() % HEIGHT;
+        int x1 = RNG_GetRandom() % WIDTH;
+        int y1 = RNG_GetRandom() % HEIGHT;
+        int x2 = RNG_GetRandom() % WIDTH;
+        int y2 = RNG_GetRandom() % HEIGHT;
+        uint32_t color = RNG_GetRandom() | (0xFF << 24);
+        REN_FillTriangle(x0, y0, x1, y1, x2, y2, color);
+        //REN_FillTriangle(_x0, _y0, _x1, _y1, _x2, _y2, color);
+    }
 }
 
 typedef struct
@@ -150,7 +325,7 @@ typedef struct
     char letter[2];
 } block_t;
 
-#define NUM_BLOCKS 10
+#define NUM_BLOCKS 500
 
 static block_t blocks[NUM_BLOCKS];
 
@@ -179,7 +354,7 @@ void FunInit()
     }
 }
 
-void Fun()
+void Fun(bool drawRects)
 {
     for(int i = 0; i < NUM_BLOCKS; ++i)
     {
@@ -202,14 +377,16 @@ void Fun()
         blocks[i].dx = dx;
         blocks[i].dy = dy;
 
-        REN_FillRect(x, y, 16, 16, blocks[i].color);
-        //REN_DrawString(blocks[i].letter, x, y, blocks[i].color);
+        if(drawRects)
+            REN_FillRect(x, y, 16, 16, blocks[i].color);
+        else
+            REN_DrawString(blocks[i].letter, x, y, blocks[i].color);
     }
 }
 
-/*
+
 void led_on(uint32_t led)
 {
     GPIO_WritePin(GPIOI, led, 1);
 }
-*/
+

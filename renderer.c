@@ -61,7 +61,7 @@ void REN_Clear(color_t color)
     image.offset = 0;
 
     DMA2D_SetOutput(&image, width, height);
-    DMA2D_StartTransfer(TT_REGTOMEM);
+    DMA2D_StartTransfer(TT_REG_TO_MEM);
 }
 
 void REN_PutPixel(int x, int y, color_t color)
@@ -97,7 +97,7 @@ void REN_VerticalLine(int x, int y, int length, color_t color)
     image.offset = width - 1;
 
     DMA2D_SetOutput(&image, 1, length);
-    DMA2D_StartTransfer(TT_REGTOMEM);
+    DMA2D_StartTransfer(TT_REG_TO_MEM);
 }
 
 void REN_HorizontalLine(int x, int y, int length, color_t color)
@@ -126,7 +126,7 @@ void REN_HorizontalLine(int x, int y, int length, color_t color)
     image.offset = width;
 
     DMA2D_SetOutput(&image, length, 1);
-    DMA2D_StartTransfer(TT_REGTOMEM);
+    DMA2D_StartTransfer(TT_REG_TO_MEM);
 }
 
 static void swap(int *v1, int *v2)
@@ -219,17 +219,15 @@ void REN_FillRect(int x, int y, int width, int height, color_t color)
     image.offset = screenWidth - width;
 
     DMA2D_SetOutput(&image, width, height);
-    DMA2D_StartTransfer(TT_REGTOMEM);
+    DMA2D_StartTransfer(TT_REG_TO_MEM);
 }
 
 void REN_DrawCircle(int xc, int yc, int radius, color_t color)
 {
-    int x = radius - 1;
+    int x = radius;
     int y = 0;
-    int dx = 1;
-    int dy = 1;
-    int err = dx - (radius * 2);
-
+    int err = 0;
+ 
     while(x >= y)
     {
         REN_PutPixel(xc + x, yc + y, color);
@@ -240,19 +238,17 @@ void REN_DrawCircle(int xc, int yc, int radius, color_t color)
         REN_PutPixel(xc - y, yc - x, color);
         REN_PutPixel(xc + y, yc - x, color);
         REN_PutPixel(xc + x, yc - y, color);
-
-        if(err <= 0)
+    
+        if (err <= 0)
         {
             y++;
-            err += dy;
-            dy += 2;
+            err += 2*y + 1;
         }
-
-        if(err > 0)
+    
+        if (err > 0)
         {
             x--;
-            dx += 2;
-            err += dx - (radius * 2);
+            err -= 2*x + 1;
         }
     }
 }
@@ -278,49 +274,49 @@ void REN_DrawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t co
 
 typedef struct
 {
-    vector_t v0;
     vector_t v1;
+    vector_t v2;
 } edge_t;
 
-static edge_t MakeEdge(vector_t v0, vector_t v1)
+static edge_t MakeEdge(vector_t v1, vector_t v2)
 {
     edge_t edge;
-    if(v0.y < v1.y)
+    if(v1.y < v2.y)
     {
-        edge.v0 = v0;
         edge.v1 = v1;
+        edge.v2 = v2;
     }
     else
     {
-        edge.v0 = v1;
-        edge.v1 = v0;
+        edge.v1 = v2;
+        edge.v2 = v1;
     }
     
     return edge;
 }
 
-static void DrawEdgeSpan(edge_t e0, edge_t e1, color_t color)
+static void DrawEdgeSpan(edge_t edgeLong, edge_t edgeShort, color_t color)
 {
-    float e0dy = e0.v1.y - e0.v0.y;
-    if(e0dy == 0.0f)
+    float eldy = edgeLong.v2.y - edgeLong.v1.y;
+    if(eldy == 0.0f)
         return;
 
-    float e1dy = e1.v1.y - e1.v0.y;
-    if(e1dy == 0.0f)
+    float esdy = edgeShort.v2.y - edgeShort.v1.y;
+    if(esdy == 0.0f)
         return;
 
-    float e0dx = e0.v1.x - e0.v0.x;
-    float e1dx = e1.v1.x - e1.v0.x;
+    float eldx = edgeLong.v2.x - edgeLong.v1.x;
+    float esdx = edgeShort.v2.x - edgeShort.v1.x;
 
-    float factor0 = (e1.v0.y - e0.v0.y) / e0dy;
-    float factorStep0 = 1.0f / e0dy;
+    float factor0 = (edgeShort.v1.y - edgeLong.v1.y) / eldy;
+    float factorStep0 = 1.0f / eldy;
     float factor1 = 0;
-    float factorStep1 = 1.0f / e1dy;
+    float factorStep1 = 1.0f / esdy;
 
-    for(int y = e1.v0.y; y < e1.v1.y; ++y)
+    for(int y = edgeShort.v1.y; y < edgeShort.v2.y; ++y)
     {
-        int x1 = (int)roundf(e0.v0.x + (e0dx * factor0));
-        int x2 = (int)roundf(e1.v0.x + (e1dx * factor1));
+        int x1 = (int)roundf(edgeLong.v1.x + (eldx * factor0));
+        int x2 = (int)roundf(edgeShort.v1.x + (esdx * factor1));
         if(x2 < x1)
         {
             swap(&x1, &x2);
@@ -350,7 +346,7 @@ void REN_FillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t co
     int longEdge = 0;
     for(int i = 0; i < 3; ++i)
     {
-        int length = edges[i].v1.y - edges[i].v0.y;
+        int length = edges[i].v2.y - edges[i].v1.y;
         if(length > maxLength)
         {
             maxLength = length;
@@ -389,7 +385,7 @@ static void BlitGlyph(int x, int y, int glyph, color_t color)
     DMA2D_SetForeground(&foreground);
     DMA2D_SetBackground(&background);
     DMA2D_SetOutput(&output, GLYPH_WIDTH, GLYPH_HEIGHT);
-    DMA2D_StartTransfer(TT_MEMTOMEMBLEND);
+    DMA2D_StartTransfer(TT_MEM_TO_MEM_BLEND);
 }
 
 void REN_DrawString(const char *string, int x, int y, color_t color)

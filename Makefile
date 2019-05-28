@@ -27,5 +27,11 @@ $(EXECUTABLE).elf: $(OBJECTS) $(LD_FILE)
 
 .PHONY: clean
 
+# for unix terminals use
+#rm -f *.o *.d $(EXECUTABLE).elf $(EXECUTABLE).hex
+# for windows cmd use
+#del *.o *.d $(EXECUTABLE).elf $(EXECUTABLE).hex
+
 clean:
 	rm -f *.o *.d $(EXECUTABLE).elf $(EXECUTABLE).hex
+	

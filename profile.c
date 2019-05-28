@@ -17,50 +17,55 @@ static void DrawStatsFast(uint32_t clearTime, uint32_t verHorLineTime,
                         uint32_t lineTimeAvg, uint32_t rectTimeAvg, 
                         uint32_t rectFillTimeAvg, uint32_t circleTimeAvg, 
                         uint32_t circleFillTimeAvg, uint32_t triangleTimeAvg, 
-                        uint32_t triangleFillTimeAvg, uint32_t pixelTimeAvg)
+                        uint32_t triangleFillTimeAvg, uint32_t pixelTimeAvg,
+                        uint32_t textTime, uint32_t textTimeAvg)
 {
     REN_Clear(COL_BLACK);
 
     int yPos = 1;
 
     char buffer[100];
-    sprintf(buffer, "CLEAR        %lu MS | AVG %lu MS", clearTime, clearTimeAvg);
+    sprintf(buffer, "CLEAR        AVG %lu MS | %lu MS", clearTimeAvg, clearTime);
     REN_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "PUTPIXEL     %lu MS | AVG %lu MS", pixelTime, pixelTimeAvg);
+    sprintf(buffer, "PUTPIXEL     AVG %lu MS | %lu MS", pixelTimeAvg, pixelTime);
     REN_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "VERHORLINE   %lu MS | AVG %lu MS", verHorLineTime, verHorLineTimeAvg);
+    sprintf(buffer, "VERHORLINE   AVG %lu MS | %lu MS", verHorLineTimeAvg, verHorLineTime);
     REN_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "LINE         %lu MS | AVG %lu MS", lineTime, lineTimeAvg);
+    sprintf(buffer, "LINE         AVG %lu MS | %lu MS", lineTimeAvg, lineTime);
     REN_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "RECT         %lu MS | AVG %lu MS", rectTime, rectTimeAvg);
+    sprintf(buffer, "RECT         AVG %lu MS | %lu MS", rectTimeAvg, rectTime);
     REN_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "RECTFILL     %lu MS | AVG %lu MS", rectFillTime, rectFillTimeAvg);
+    sprintf(buffer, "RECTFILL     AVG %lu MS | %lu MS", rectFillTimeAvg, rectFillTime);
     REN_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "CIRCLE       %lu MS | AVG %lu MS", circleTime, circleTimeAvg);
+    sprintf(buffer, "CIRCLE       AVG %lu MS | %lu MS", circleTimeAvg, circleTime);
     REN_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "CIRCLEFILL   %lu MS | AVG %lu MS", circleFillTime, circleFillTimeAvg);
+    sprintf(buffer, "CIRCLEFILL   AVG %lu MS | %lu MS", circleFillTimeAvg, circleFillTime);
     REN_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "TRIANGLE     %lu MS | AVG %lu MS", triangleTime, triangleTimeAvg);
+    sprintf(buffer, "TRIANGLE     AVG %lu MS | %lu MS", triangleTimeAvg, triangleTime);
     REN_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "TRIANGLEFILL %lu MS | AVG %lu MS", triangleFillTime, triangleFillTimeAvg);
+    sprintf(buffer, "TRIANGLEFILL AVG %lu MS | %lu MS", triangleFillTimeAvg, triangleFillTime);
+    REN_DrawString(buffer, 1, yPos, COL_YELLOW);
+
+    yPos += 16;
+    sprintf(buffer, "TEXT         AVG %lu MS | %lu MS", textTimeAvg, textTime);
     REN_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     REN_Flip(true);
@@ -77,50 +82,55 @@ static void DrawStatsSlow(uint32_t clearTime, uint32_t verHorLineTime,
                         uint32_t lineTimeAvg, uint32_t rectTimeAvg, 
                         uint32_t rectFillTimeAvg, uint32_t circleTimeAvg, 
                         uint32_t circleFillTimeAvg, uint32_t triangleTimeAvg, 
-                        uint32_t triangleFillTimeAvg, uint32_t pixelTimeAvg)
+                        uint32_t triangleFillTimeAvg, uint32_t pixelTimeAvg,
+                        uint32_t textTime, uint32_t textTimeAvg)
 {
     RENS_Clear(COL_BLACK);
 
     int yPos = 1;
 
     char buffer[100];
-    sprintf(buffer, "CLEAR        %lu MS | AVG %lu MS", clearTime, clearTimeAvg);
+    sprintf(buffer, "CLEAR        AVG %lu MS | %lu MS", clearTimeAvg, clearTime);
     RENS_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "PUTPIXEL     %lu MS | AVG %lu MS", pixelTime, pixelTimeAvg);
+    sprintf(buffer, "PUTPIXEL     AVG %lu MS | %lu MS", pixelTimeAvg, pixelTime);
     RENS_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "VERHORLINE   %lu MS | AVG %lu MS", verHorLineTime, verHorLineTimeAvg);
+    sprintf(buffer, "VERHORLINE   AVG %lu MS | %lu MS", verHorLineTimeAvg, verHorLineTime);
     RENS_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "LINE         %lu MS | AVG %lu MS", lineTime, lineTimeAvg);
+    sprintf(buffer, "LINE         AVG %lu MS | %lu MS", lineTimeAvg, lineTime);
     RENS_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "RECT         %lu MS | AVG %lu MS", rectTime, rectTimeAvg);
+    sprintf(buffer, "RECT         AVG %lu MS | %lu MS", rectTimeAvg, rectTime);
     RENS_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "RECTFILL     %lu MS | AVG %lu MS", rectFillTime, rectFillTimeAvg);
+    sprintf(buffer, "RECTFILL     AVG %lu MS | %lu MS", rectFillTimeAvg, rectFillTime);
     RENS_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "CIRCLE       %lu MS | AVG %lu MS", circleTime, circleTimeAvg);
-    REN_DrawString(buffer, 1, yPos, COL_YELLOW);
-
-    yPos += 16;
-    sprintf(buffer, "CIRCLEFILL   %lu MS | AVG %lu MS", circleFillTime, circleFillTimeAvg);
+    sprintf(buffer, "CIRCLE       AVG %lu MS | %lu MS", circleTimeAvg, circleTime);
     RENS_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "TRIANGLE     %lu MS | AVG %lu MS", triangleTime, triangleTimeAvg);
+    sprintf(buffer, "CIRCLEFILL   AVG %lu MS | %lu MS", circleFillTimeAvg, circleFillTime);
     RENS_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     yPos += 16;
-    sprintf(buffer, "TRIANGLEFILL %lu MS | AVG %lu MS", triangleFillTime, triangleFillTimeAvg);
+    sprintf(buffer, "TRIANGLE     AVG %lu MS | %lu MS", triangleTimeAvg, triangleTime);
+    RENS_DrawString(buffer, 1, yPos, COL_YELLOW);
+
+    yPos += 16;
+    sprintf(buffer, "TRIANGLEFILL AVG %lu MS | %lu MS", triangleFillTimeAvg, triangleFillTime);
+    RENS_DrawString(buffer, 1, yPos, COL_YELLOW);
+
+    yPos += 16;
+    sprintf(buffer, "TEXT         AVG %lu MS | %lu MS", textTimeAvg, textTime);
     RENS_DrawString(buffer, 1, yPos, COL_YELLOW);
 
     RENS_Flip(true);
@@ -133,11 +143,11 @@ void ProfileFast(viewport_t viewport)
     uint32_t start, end, buf;
     uint32_t clearTime, verHorLineTime, lineTime, rectTime, rectFillTime,
                 circleTime, circleFillTime, triangleTime, triangleFillTime,
-                pixelTime;
+                pixelTime, textTime;
     
     uint32_t clearTimeAvg, verHorLineTimeAvg, lineTimeAvg, rectTimeAvg, rectFillTimeAvg,
                 circleTimeAvg, circleFillTimeAvg, triangleTimeAvg, triangleFillTimeAvg,
-                pixelTimeAvg;
+                pixelTimeAvg, textTimeAvg;
 
     REN_Init(viewport);
 
@@ -251,13 +261,24 @@ void ProfileFast(viewport_t viewport)
     triangleFillTimeAvg = buf / MAX_RUNS;
     triangleFillTime = buf;
 
+    buf = 0;
+    for(int i = 0; i < MAX_RUNS; i++)
+    {
+        start = millis();
+        REN_DrawString("HELLO WORLD!", 200, 200, COL_MAGENTA);
+        end = millis();
+        buf += end - start;
+    }
+    textTimeAvg = buf / MAX_RUNS;
+    textTime = buf;
+
     DrawStatsFast(clearTime, verHorLineTime, lineTime, 
                     rectTime, rectFillTime, circleTime,
                     circleFillTime, triangleTime, triangleFillTime, 
                     pixelTime, clearTimeAvg, verHorLineTimeAvg, lineTimeAvg, 
                     rectTimeAvg, rectFillTimeAvg, circleTimeAvg,
                     circleFillTimeAvg, triangleTimeAvg, triangleFillTimeAvg, 
-                    pixelTimeAvg);
+                    pixelTimeAvg, textTime, textTimeAvg);
 }
 
 void ProfileSlow(viewport_t viewport)
@@ -265,11 +286,11 @@ void ProfileSlow(viewport_t viewport)
     uint32_t start, end, buf;
     uint32_t clearTime, verHorLineTime, lineTime, rectTime, rectFillTime,
                 circleTime, circleFillTime, triangleTime, triangleFillTime,
-                pixelTime;
+                pixelTime, textTime;
     
     uint32_t clearTimeAvg, verHorLineTimeAvg, lineTimeAvg, rectTimeAvg, rectFillTimeAvg,
                 circleTimeAvg, circleFillTimeAvg, triangleTimeAvg, triangleFillTimeAvg,
-                pixelTimeAvg;
+                pixelTimeAvg, textTimeAvg;
 
     RENS_Init(viewport);
 
@@ -310,7 +331,7 @@ void ProfileSlow(viewport_t viewport)
     for(int i = 0; i < MAX_RUNS; i++)
     {
         start = millis();
-        REN_DrawRect(0, 0, 100, 100, COL_MAGENTA);
+        RENS_DrawRect(0, 0, 100, 100, COL_MAGENTA);
         end = millis();
         buf += end - start;
     }
@@ -383,11 +404,22 @@ void ProfileSlow(viewport_t viewport)
     triangleFillTimeAvg = buf / MAX_RUNS;
     triangleFillTime = buf;
 
+    buf = 0;
+    for(int i = 0; i < MAX_RUNS; i++)
+    {
+        start = millis();
+        RENS_DrawString("HELLO WORLD!", 200, 200, COL_MAGENTA);
+        end = millis();
+        buf += end - start;
+    }
+    textTimeAvg = buf / MAX_RUNS;
+    textTime = buf;
+
     DrawStatsSlow(clearTime, verHorLineTime, lineTime, 
                     rectTime, rectFillTime, circleTime,
                     circleFillTime, triangleTime, triangleFillTime, 
                     pixelTime, clearTimeAvg, verHorLineTimeAvg, lineTimeAvg, 
                     rectTimeAvg, rectFillTimeAvg, circleTimeAvg,
                     circleFillTimeAvg, triangleTimeAvg, triangleFillTimeAvg, 
-                    pixelTimeAvg);
+                    pixelTimeAvg, textTime, textTimeAvg);
 }
